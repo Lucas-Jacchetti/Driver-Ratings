@@ -1,9 +1,10 @@
 namespace backend.Domain.Entities;
 
-public class Driver
+public class Season
 {
     public Guid Id { get; set; }
-    public required string Name { get; set; }
+    public int Year { get; set; }
+
+    public ICollection<Race> Races { get; set; } = [];
     public ICollection<DriverSeason> DriverSeasons { get; set; } = [];
-    
 }
