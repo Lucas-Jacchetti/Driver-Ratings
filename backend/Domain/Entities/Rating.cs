@@ -13,6 +13,5 @@ public class Rating
     public DriverRaceResult DriverRaceResult { get; set; } = null!;
 
     public Score Score { get; set; } = null!;
-    public string? Comment { get; set; }
     public DateTime RatedAt { get; set; } = DateTime.UtcNow;
 }
