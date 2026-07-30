@@ -2,7 +2,7 @@ using backend.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace backend.Data.Configurations;
+namespace backend.Data.Configuration;
 
 public class RatingConfiguration : IEntityTypeConfiguration<Rating>
 {
