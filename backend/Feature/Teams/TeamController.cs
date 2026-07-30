@@ -1,14 +1,15 @@
+using backend.Feature.Teams.DataManipulation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Feature.Teams;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TeamsController : ControllerBase
+public class TeamController : ControllerBase
 {
     private readonly ITeamService _service;
 
-    public TeamsController(ITeamService service)
+    public TeamController(ITeamService service)
     {
         _service = service;
     }

@@ -1,6 +1,6 @@
 using backend.Domain.Entities;
 
-namespace backend.Feature.Teams;
+namespace backend.Feature.Teams.DataManipulation;
 
 public static class TeamMapper
 {

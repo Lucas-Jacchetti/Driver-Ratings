@@ -1,4 +1,4 @@
-namespace backend.Feature.Teams;
+namespace backend.Feature.Teams.DataManipulation;
 
 public record TeamResponseDTO(
     Guid Id,
