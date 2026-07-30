@@ -3,6 +3,9 @@ namespace backend.Domain.Entities;
 public class Community
 {
     public Guid Id { get; set; }
+    public required string Name { get; set; }
+    public string? AccessCode { get; set; }
+    public required string Description { get; set; }
     public Guid HostId { get; set; }
     public User Host { get; set; } = null!;
     public bool IsPublic { get; set; }
