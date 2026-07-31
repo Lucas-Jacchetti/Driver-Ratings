@@ -1,15 +1,13 @@
 using backend.Feature.DriverSeasons.DataManipulation;
 using backend.Feature.Races.DataManipulation;
-using backend.Feature.Ratings.DataManipulation;
 
 namespace backend.Feature.DriverRaceResults.DataManipulation;
 
-public record DriverRaceResultResponseDTO(
+public record DriverRaceResultSummaryDTO(
     Guid Id,
     DriverSeasonSummaryDTO DriverSeason,
     RaceSummaryDTO Race,
     int StartingPosition,
     int FinishingPosition,
-    string Context,
-    ICollection<RatingSummaryDTO> Ratings
+    string Context
 );

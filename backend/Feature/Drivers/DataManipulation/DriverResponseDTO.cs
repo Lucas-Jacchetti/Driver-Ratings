@@ -1,9 +1,9 @@
-using backend.Feature.DriverSeason.DataManipulation;
+using backend.Feature.DriverSeasons.DataManipulation;
 
 namespace backend.Feature.Drivers.DataManipulation;
 
 public record DriverResponseDTO(
     Guid Id,
     string Name,
-    ICollection<DriverSeasonResponseDTO> DriverSeasons
+    ICollection<DriverSeasonSummaryDTO> DriverSeasons
 );

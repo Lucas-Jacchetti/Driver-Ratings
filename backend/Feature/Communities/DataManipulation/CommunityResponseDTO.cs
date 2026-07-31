@@ -9,7 +9,7 @@ public record CommunityResponseDTO(
     string Name,
     string? AccessCode,
     string Description,
-    UserResponseDTO Host,
+    UserSummaryDTO Host,
     bool IsPublic,
     string? ImgUrl,
     ICollection<CommunityMemberResponseDTO> Members,

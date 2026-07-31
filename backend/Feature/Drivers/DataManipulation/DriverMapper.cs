@@ -1,6 +1,20 @@
+using backend.Domain.Entities;
+using backend.Feature.DriverSeasons.DataManipulation;
+
 namespace backend.Feature.Drivers.DataManipulation;
 
-public class DriverMapper
+public static class DriverMapper
 {
-    
-}
+    public static DriverResponseDTO ToResponse(Driver driver) =>
+        new(
+            driver.Id,
+            driver.Name,
+            driver.DriverSeasons.Select(DriverSeasonMapper.ToSummary).ToList()
+        );
+
+    public static DriverSummaryDTO ToSummary(Driver driver) =>
+        new(driver.Id, driver.Name);
+
+    public static Driver ToDomain(string name) =>
+        new() { Name = name };
+}       

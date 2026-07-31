@@ -1,12 +1,12 @@
 
-using backend.Feature.Communities.DataManipulation;
 using backend.Feature.Users.DataManipulation;
 
 namespace backend.Feature.CommunityMembers.DataManipulation;
 
 public record CommunityMemberResponseDTO(
     Guid Id,
-    CommunityResponseDTO Community,
-    UserResponseDTO User,
+    Guid CommunityId,
+    string Community,
+    UserSummaryDTO User,
     DateTime JoinedAt
 );

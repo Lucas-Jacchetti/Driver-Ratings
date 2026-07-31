@@ -1,4 +1,4 @@
-namespace backend.Feature.DriverSeason.DataManipulation;
+namespace backend.Feature.DriverSeasons.DataManipulation;
 
 public record DriverSeasonCreationDTO(
     int DriverNumber,
