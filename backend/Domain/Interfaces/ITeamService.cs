@@ -1,6 +1,6 @@
 using backend.Domain.Entities;
 
-namespace backend.Feature.Teams;
+namespace backend.Domain.Interfaces;
 
 public interface ITeamService
 {
