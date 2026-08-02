@@ -33,6 +33,19 @@ public class TeamController : ControllerBase
             return Conflict(new { error = "A team with this name already exists." });
         }
 
-        return Created($"/api/teams/{teamCreated.Id}",TeamMapper.ToResponse(teamCreated));
+        return CreatedAtAction(nameof(GetById),TeamMapper.ToResponse(teamCreated));
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var team = await _service.GetByIdAsync(id);
+
+        if (team is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(TeamMapper.ToResponse(team));
     }
 }

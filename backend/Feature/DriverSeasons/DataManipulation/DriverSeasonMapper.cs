@@ -27,12 +27,12 @@ public static class DriverSeasonMapper
             SeasonMapper.ToSummary(driverSeason.Season)
         );
 
-    public static DriverSeason ToDomain(int driverNumber, Guid driverId, Guid teamId, Guid seasonId) =>
+    public static DriverSeason ToDomain(DriverSeasonCreationDTO driverSeasonCreationDTO) =>
         new()
         {
-            DriverNumber = driverNumber,
-            DriverId = driverId,
-            TeamId = teamId,
-            SeasonId = seasonId
+            DriverNumber = driverSeasonCreationDTO.DriverNumber,
+            DriverId = driverSeasonCreationDTO.DriverId,
+            TeamId = driverSeasonCreationDTO.TeamId,
+            SeasonId = driverSeasonCreationDTO.SeasonId
         };
 }

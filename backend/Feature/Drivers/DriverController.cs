@@ -43,10 +43,10 @@ public class DriverController : ControllerBase
 
         if (driverCreated is null)
         {
-            return BadRequest(new { error = "An error ocurred during driver creation" });
+            return BadRequest(new { error = "Invalid driver name" });
         }
 
-        return Created($"/api/driver/{driverCreated.Id}", DriverMapper.ToResponse(driverCreated));
+        return CreatedAtAction(nameof(GetById), DriverMapper.ToResponse(driverCreated));
     }
 
     [HttpDelete("{id:guid}")]

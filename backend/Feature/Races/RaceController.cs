@@ -46,7 +46,7 @@ public class RaceController : ControllerBase
             return BadRequest(new { error = "Season not found" });
         }
 
-        return Created($"/api/races/{raceCreated.Id}", RaceMapper.ToResponse(raceCreated));
+        return Created(nameof(GetById), RaceMapper.ToResponse(raceCreated));
     }
 
     [HttpDelete("{id:guid}")]

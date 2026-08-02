@@ -35,4 +35,10 @@ public class TeamService : ITeamService
 
         return team;
     }
+
+    public async Task<Team?> GetByIdAsync(Guid id)
+    {
+        return await _dbContext.Teams
+            .FirstOrDefaultAsync(r => r.Id == id);
+    }
 }

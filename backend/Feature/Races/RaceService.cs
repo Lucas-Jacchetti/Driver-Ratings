@@ -1,6 +1,7 @@
 using backend.Data;
 using backend.Domain.Entities;
 using backend.Domain.Interfaces;
+using backend.Feature.Races.DataManipulation;
 using Microsoft.EntityFrameworkCore;
 namespace backend.Feature.Races;
 
@@ -44,32 +45,14 @@ public class RaceService : IRaceService
     public async Task<ICollection<Race>> GetAllAsync()
     {
         return await _dbContext.Races
-            .Include(r => r.Season)
-            .Include(r => r.DriverRaceResults)
-                .ThenInclude(drr => drr.DriverSeason)
-                    .ThenInclude(ds => ds.Driver)
-            .Include(r => r.DriverRaceResults)
-                .ThenInclude(drr => drr.DriverSeason)
-                    .ThenInclude(ds => ds.Team)
-            .Include(r => r.DriverRaceResults)
-                .ThenInclude(drr => drr.DriverSeason)
-                    .ThenInclude(ds => ds.Season)
+            .IncludeForMapping()
             .ToListAsync();
     }
 
     public async Task<Race?> GetByIdAsync(Guid id)
     {
         return await _dbContext.Races
-            .Include(r => r.Season)
-            .Include(r => r.DriverRaceResults)
-                .ThenInclude(drr => drr.DriverSeason)
-                    .ThenInclude(ds => ds.Driver)
-            .Include(r => r.DriverRaceResults)
-                .ThenInclude(drr => drr.DriverSeason)
-                    .ThenInclude(ds => ds.Team)
-            .Include(r => r.DriverRaceResults)
-                .ThenInclude(drr => drr.DriverSeason)
-                    .ThenInclude(ds => ds.Season)
+            .IncludeForMapping()
             .FirstOrDefaultAsync(r => r.Id == id);
     }
 }
