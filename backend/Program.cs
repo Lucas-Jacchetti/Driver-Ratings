@@ -1,5 +1,6 @@
 using backend.Data;
 using backend.Domain.Interfaces;
+using backend.Feature.Drivers;
 using backend.Feature.Races;
 using backend.Feature.Teams;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IRaceService, RaceService>();
+builder.Services.AddScoped<IDriverService, DriverService>();
 
 var app = builder.Build();
 

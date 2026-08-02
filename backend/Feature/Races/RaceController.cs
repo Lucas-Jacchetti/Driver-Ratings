@@ -6,11 +6,11 @@ namespace backend.Feature.Races;
 
 [ApiController]
 [Route("api/[controller]")]
-public class RacesController : ControllerBase
+public class RaceController : ControllerBase
 {
     private readonly IRaceService _service;
 
-    public RacesController(IRaceService service)
+    public RaceController(IRaceService service)
     {
         _service = service;
     }
@@ -43,7 +43,7 @@ public class RacesController : ControllerBase
 
         if (raceCreated is null)
         {
-            return BadRequest(new { error = "Season not found." });
+            return BadRequest(new { error = "Season not found" });
         }
 
         return Created($"/api/races/{raceCreated.Id}", RaceMapper.ToResponse(raceCreated));

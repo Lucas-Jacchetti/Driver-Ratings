@@ -15,6 +15,6 @@ public static class DriverMapper
     public static DriverSummaryDTO ToSummary(Driver driver) =>
         new(driver.Id, driver.Name);
 
-    public static Driver ToDomain(string name) =>
-        new() { Name = name };
+    public static Driver ToDomain(DriverCreationDTO driverCreationDTO) =>
+        new() { Name = driverCreationDTO.Name };
 }       
