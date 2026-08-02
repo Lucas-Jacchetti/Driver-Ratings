@@ -1,3 +1,4 @@
+using backend.Domain.Interfaces;
 using backend.Feature.Teams.DataManipulation;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,13 +25,14 @@ public class TeamController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(TeamCreationDTO request)
     {
-        var team = await _service.CreateAsync(request.Name);
+        var team = TeamMapper.ToDomain(request);
+        var teamCreated = await _service.CreateAsync(team);
 
-        if (team == null)
+        if (teamCreated == null)
         {
             return Conflict(new { error = "A team with this name already exists." });
         }
 
-        return Created($"/api/teams/{team.Id}",TeamMapper.ToResponse(team));
+        return Created($"/api/teams/{teamCreated.Id}",TeamMapper.ToResponse(teamCreated));
     }
 }

@@ -22,15 +22,13 @@ public class TeamService : ITeamService
             .ToListAsync();
     }
 
-    public async Task<Team?> CreateAsync(string name)
+    public async Task<Team?> CreateAsync(Team team)
     {
-        var alreadyExists = await _dbContext.Teams.AnyAsync(t => t.Name == name);
+        var alreadyExists = await _dbContext.Teams.AnyAsync(t => t.Name == team.Name);
         if (alreadyExists)
         {
             return null;
         }
-
-        var team = TeamMapper.ToDomain(name);
 
         _dbContext.Teams.Add(team);
         await _dbContext.SaveChangesAsync();

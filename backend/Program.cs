@@ -1,4 +1,6 @@
 using backend.Data;
+using backend.Domain.Interfaces;
+using backend.Feature.Races;
 using backend.Feature.Teams;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +17,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.AddScoped<IRaceService, RaceService>();
 
 var app = builder.Build();
 

@@ -19,6 +19,6 @@ public static class RaceMapper
     public static RaceSummaryDTO ToSummary(Race race) =>
         new(race.Id, race.Name, race.Circuit, race.Date);
 
-    public static Race ToDomain(string name, string circuit, DateTime date, Guid seasonId) =>
-        new() { Name = name, Circuit = circuit, Date = date, SeasonId = seasonId };
+    public static Race ToDomain(RaceCreationDTO raceCreationDTO) =>
+        new() { Name = raceCreationDTO.Name, Circuit = raceCreationDTO.Circuit, Date = raceCreationDTO.Date, SeasonId = raceCreationDTO.SeasonId };
 }

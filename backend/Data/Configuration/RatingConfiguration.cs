@@ -10,8 +10,6 @@ public class RatingConfiguration : IEntityTypeConfiguration<Rating>
     {
         builder.HasIndex(r => new { r.UserId, r.DriverRaceResultId }).IsUnique();
 
-        builder.Property(r => r.Comment).HasMaxLength(1000);
-
         builder.OwnsOne(r => r.Score, score =>
         {
             score.Property(s => s.Value)

@@ -5,5 +5,5 @@ namespace backend.Domain.Interfaces;
 public interface ITeamService
 {
     Task<ICollection<Team>> GetAllAsync();
-    Task<Team?> CreateAsync(string name);
+    Task<Team?> CreateAsync(Team team);
 }
