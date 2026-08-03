@@ -1,11 +1,12 @@
+using backend.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Feature.DriverSeasons.DataManipulation;
 
 public static class DriverSeasonQueryExtensions
 {
-    public static IQueryable<Domain.Entities.DriverSeason> IncludeForMapping(
-        this IQueryable<Domain.Entities.DriverSeason> query) =>
+    public static IQueryable<DriverSeason> IncludeForMapping(
+        this IQueryable<DriverSeason> query) =>
         query
             .Include(ds => ds.Driver)
             .Include(ds => ds.DriverRaceResults)

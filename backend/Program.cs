@@ -1,5 +1,6 @@
 using backend.Data;
 using backend.Domain.Interfaces;
+using backend.Feature.DriverRaceResults;
 using backend.Feature.Drivers;
 using backend.Feature.Races;
 using backend.Feature.Teams;
@@ -20,6 +21,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IRaceService, RaceService>();
 builder.Services.AddScoped<IDriverService, DriverService>();
+builder.Services.AddScoped<IDriverRaceResultService, DriverRaceResultService>();
 
 var app = builder.Build();
 

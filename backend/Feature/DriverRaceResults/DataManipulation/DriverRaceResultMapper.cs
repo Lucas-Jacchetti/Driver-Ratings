@@ -28,14 +28,13 @@ public static class DriverRaceResultMapper
             result.Context
         );
 
-    public static DriverRaceResult ToDomain(
-        Guid driverSeasonId, Guid raceId, int startingPosition, int finishingPosition, string context) =>
+    public static DriverRaceResult ToDomain(DriverRaceResultCreationDTO driverRaceResultCreationDTO) =>
         new()
         {
-            DriverSeasonId = driverSeasonId,
-            RaceId = raceId,
-            StartingPosition = startingPosition,
-            FinishingPosition = finishingPosition,
-            Context = context
+            DriverSeasonId = driverRaceResultCreationDTO.DriverSeasonId,
+            RaceId = driverRaceResultCreationDTO.RaceId,
+            StartingPosition = driverRaceResultCreationDTO.StartingPosition,
+            FinishingPosition = driverRaceResultCreationDTO.FinishingPosition,
+            Context = driverRaceResultCreationDTO.Context
         };
 }
