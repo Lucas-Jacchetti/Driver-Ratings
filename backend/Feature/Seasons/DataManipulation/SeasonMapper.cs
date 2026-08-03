@@ -17,6 +17,6 @@ public static class SeasonMapper
     public static SeasonSummaryDTO ToSummary(Season season) =>
         new(season.Id, season.Year);
 
-    public static Season ToDomain(int year) =>
-        new() { Year = year };
+    public static Season ToDomain(SeasonCreationDTO seasonCreationDTO) =>
+        new() { Year = seasonCreationDTO.Year };
 }
