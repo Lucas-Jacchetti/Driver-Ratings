@@ -16,6 +16,11 @@ public class SeasonService : ISeasonService
 
     public async Task<Season?> CreateAsync(Season season)
     {
+        if (season.Year < 2026)
+        {
+            return null;
+        }
+        
         _dbContext.Seasons.Add(season);
         await _dbContext.SaveChangesAsync();
 

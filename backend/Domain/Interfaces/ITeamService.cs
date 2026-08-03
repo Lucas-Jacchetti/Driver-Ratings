@@ -7,4 +7,5 @@ public interface ITeamService
     Task<ICollection<Team>> GetAllAsync();
     Task<Team?> CreateAsync(Team team);
     Task<Team?> GetByIdAsync(Guid Id);
+    Task<Team?> DeleteAsync(Guid Id);
 }

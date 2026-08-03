@@ -41,4 +41,18 @@ public class TeamService : ITeamService
         return await _dbContext.Teams
             .FirstOrDefaultAsync(r => r.Id == id);
     }
+
+    public async Task<Team?> DeleteAsync(Guid teamId)
+    {
+        var team = await _dbContext.Teams.FindAsync(teamId);
+        if (team is null)
+        {
+            return null;
+        }
+
+        _dbContext.Teams.Remove(team);
+        await _dbContext.SaveChangesAsync();
+
+        return team;
+    }
 }

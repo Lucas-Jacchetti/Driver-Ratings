@@ -48,4 +48,17 @@ public class TeamController : ControllerBase
 
         return Ok(TeamMapper.ToResponse(team));
     }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var team = await _service.DeleteAsync(id);
+
+        if (team is null)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
 }
