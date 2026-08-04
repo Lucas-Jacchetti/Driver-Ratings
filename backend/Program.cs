@@ -3,6 +3,8 @@ using backend.Domain.Interfaces;
 using backend.Feature.Auth;
 using backend.Feature.DriverRaceResults;
 using backend.Feature.Drivers;
+using backend.Feature.Groups.Communities;
+using backend.Feature.Groups.CommunityMembers;
 using backend.Feature.Races;
 using backend.Feature.Ratings;
 using backend.Feature.Seasons;
@@ -30,6 +32,8 @@ builder.Services.AddScoped<ISeasonService, SeasonService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICommunityService, CommunityService>();
+builder.Services.AddScoped<ICommunityMemberService, CommunityMemberService>();
 
 var app = builder.Build();
 

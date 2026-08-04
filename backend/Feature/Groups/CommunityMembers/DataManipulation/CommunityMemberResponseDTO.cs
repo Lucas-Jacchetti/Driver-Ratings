@@ -1,7 +1,7 @@
 
 using backend.Feature.Users.DataManipulation;
 
-namespace backend.Feature.CommunityMembers.DataManipulation;
+namespace backend.Feature.Groups.CommunityMembers.DataManipulation;
 
 public record CommunityMemberResponseDTO(
     Guid Id,

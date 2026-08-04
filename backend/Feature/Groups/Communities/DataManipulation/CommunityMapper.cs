@@ -1,8 +1,9 @@
+using System.Security.Cryptography;
 using backend.Domain.Entities;
-using backend.Feature.CommunityMembers.DataManipulation;
+using backend.Feature.Groups.CommunityMembers.DataManipulation;
 using backend.Feature.Users.DataManipulation;
 
-namespace backend.Feature.Communities.DataManipulation;
+namespace backend.Feature.Groups.Communities.DataManipulation;
 
 public static class CommunityMapper
 {
@@ -11,7 +12,7 @@ public static class CommunityMapper
         return new Community
         {
             Name = dto.Name,
-            AccessCode = dto.AccessCode,
+            AccessCode = GenerateCode(dto.IsPublic),
             Description = dto.Description,
             HostId = dto.HostId,
             IsPublic = dto.IsPublic,
@@ -39,5 +40,22 @@ public static class CommunityMapper
     public static IEnumerable<CommunityResponseDTO> ToResponseList(IEnumerable<Community> communities)
     {
         return communities.Select(ToResponse);
+    }
+
+    public static string? GenerateCode(bool isPublic)
+    {
+        int length = 6;
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        if (isPublic)
+        {
+            return null;
+        }
+        
+        return new string(
+            Enumerable.Range(0, length)
+                .Select(_ => chars[RandomNumberGenerator.GetInt32(chars.Length)])
+                .ToArray()
+        );
     }
 }
