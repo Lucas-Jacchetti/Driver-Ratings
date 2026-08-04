@@ -19,11 +19,11 @@ public static class RatingMapper
     public static RatingSummaryDTO ToSummary(Rating rating) =>
         new(rating.Id, UserMapper.ToSummary(rating.User), rating.Score.Value, rating.RatedAt);
 
-    public static Rating ToDomain(Guid userId, Guid driverRaceResultId, decimal scoreValue) =>
+    public static Rating ToDomain(RatingCreationDTO ratingCreationDTO) =>
         new()
         {
-            UserId = userId,
-            DriverRaceResultId = driverRaceResultId,
-            Score = Score.Create(scoreValue),
+            UserId = ratingCreationDTO.UserId,
+            DriverRaceResultId = ratingCreationDTO.DriverRaceResultId,
+            Score = Score.Create(ratingCreationDTO.Score.Value),
         };
 }

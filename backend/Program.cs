@@ -3,6 +3,7 @@ using backend.Domain.Interfaces;
 using backend.Feature.DriverRaceResults;
 using backend.Feature.Drivers;
 using backend.Feature.Races;
+using backend.Feature.Ratings;
 using backend.Feature.Seasons;
 using backend.Feature.Teams;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ builder.Services.AddScoped<IRaceService, RaceService>();
 builder.Services.AddScoped<IDriverService, DriverService>();
 builder.Services.AddScoped<IDriverRaceResultService, DriverRaceResultService>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
+builder.Services.AddScoped<IRatingService, RatingService>();
 
 var app = builder.Build();
 
