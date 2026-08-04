@@ -8,7 +8,4 @@ public static class UserMapper
 
     public static UserSummaryDTO ToSummary(User user) =>
         new(user.Id, user.Name);
-
-    public static User ToDomain(string name, string email, string googleId) =>
-        new() { Name = name, Email = email, GoogleId = googleId };
 }

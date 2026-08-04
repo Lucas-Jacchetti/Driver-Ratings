@@ -1,11 +1,13 @@
 using backend.Data;
 using backend.Domain.Interfaces;
+using backend.Feature.Auth;
 using backend.Feature.DriverRaceResults;
 using backend.Feature.Drivers;
 using backend.Feature.Races;
 using backend.Feature.Ratings;
 using backend.Feature.Seasons;
 using backend.Feature.Teams;
+using backend.Feature.Users;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +28,8 @@ builder.Services.AddScoped<IDriverService, DriverService>();
 builder.Services.AddScoped<IDriverRaceResultService, DriverRaceResultService>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
