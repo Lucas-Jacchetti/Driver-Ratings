@@ -13,11 +13,13 @@ public class AuthService : IAuthService
 {
     private readonly IUserService _userService;
     private readonly IConfiguration _configuration;
+    private readonly IJwtTokenGenerator _tokenGenerator;
 
-    public AuthService(IUserService userService, IConfiguration configuration)
+    public AuthService(IUserService userService, IConfiguration configuration, IJwtTokenGenerator tokenGenerator)
     {
         _userService = userService;
         _configuration = configuration;
+        _tokenGenerator = tokenGenerator;
     }
 
     public async Task<Result<AuthResult>> LoginWithGoogleAsync(string idToken)
@@ -52,31 +54,8 @@ public class AuthService : IAuthService
             user = creationResult.Value;
         }
 
-        var token = GenerateJwt(user!);
+        var token = _tokenGenerator.GenerateToken(user!);
 
         return Result<AuthResult>.Success(new AuthResult(token, user!));
-    }
-
-    private string GenerateJwt(User user)
-    {
-        var jwtSecret = _configuration["Jwt:Secret"]
-            ?? throw new InvalidOperationException("Jwt:Secret não configurado.");
-
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Name, user.Name)
-        };
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var token = new JwtSecurityToken(
-            claims: claims,
-            expires: DateTime.UtcNow.AddDays(7),
-            signingCredentials: credentials);
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }
