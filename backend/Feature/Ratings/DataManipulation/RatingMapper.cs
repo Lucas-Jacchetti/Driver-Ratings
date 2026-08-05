@@ -24,6 +24,6 @@ public static class RatingMapper
         {
             UserId = ratingCreationDTO.UserId,
             DriverRaceResultId = ratingCreationDTO.DriverRaceResultId,
-            Score = Score.Create(ratingCreationDTO.Score.Value),
+            Score = Score.Create(ratingCreationDTO.Score),
         };
 }

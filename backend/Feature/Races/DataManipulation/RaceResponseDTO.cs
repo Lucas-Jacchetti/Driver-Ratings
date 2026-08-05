@@ -6,7 +6,7 @@ public record RaceResponseDTO(
     Guid Id,
     string Name,
     string Circuit,
-    DateTime Date,
+    string Date,
     SeasonSummaryDTO Season,
     ICollection<DriverRaceResultSummaryDTO> DriverRaceResults
 );

@@ -11,7 +11,7 @@ public static class RaceMapper
             race.Id,
             race.Name,
             race.Circuit,
-            race.Date,
+            race.Date.ToString("dd/MM/yyyy"),
             SeasonMapper.ToSummary(race.Season),
             race.DriverRaceResults.Select(DriverRaceResultMapper.ToSummary).ToList()
         );
