@@ -47,7 +47,7 @@ public class DriverRaceResultController : ControllerBase
         }
 
         var response = DriverRaceResultMapper.ToResponse(result.Value!);
-        return CreatedAtAction(nameof(GetById), response);
+        return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
     }
 
     [HttpDelete("{id:guid}")]

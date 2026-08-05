@@ -46,7 +46,7 @@ public class SeasonController : ControllerBase
             return BadRequest(new { error = "Invalid season year" });
         }
 
-        return CreatedAtAction(nameof(GetById), SeasonMapper.ToResponse(seasonCreated));
+        return CreatedAtAction(nameof(GetById), new { id = seasonCreated.Id }, SeasonMapper.ToResponse(seasonCreated));
     }
 
     [HttpDelete("{id:guid}")]

@@ -20,5 +20,5 @@ public static class RaceMapper
         new(race.Id, race.Name, race.Circuit, race.Date);
 
     public static Race ToDomain(RaceCreationDTO raceCreationDTO) =>
-        new() { Name = raceCreationDTO.Name, Circuit = raceCreationDTO.Circuit, Date = raceCreationDTO.Date, SeasonId = raceCreationDTO.SeasonId };
+        new() { Name = raceCreationDTO.Name, Circuit = raceCreationDTO.Circuit, Date = DateTime.SpecifyKind(raceCreationDTO.Date, DateTimeKind.Utc), SeasonId = raceCreationDTO.SeasonId };
 }

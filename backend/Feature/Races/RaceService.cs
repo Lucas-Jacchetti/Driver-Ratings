@@ -16,7 +16,7 @@ public class RaceService : IRaceService
 
     public async Task<Race?> CreateAsync(Race race)
     {
-        var seasonExists = await _dbContext.Races.AnyAsync(s => s.Id == race.SeasonId);
+        var seasonExists = await _dbContext.Seasons.AnyAsync(s => s.Id == race.SeasonId);
         if (!seasonExists)
         {
             return null;

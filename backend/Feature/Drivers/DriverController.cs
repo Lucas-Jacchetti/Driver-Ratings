@@ -46,7 +46,7 @@ public class DriverController : ControllerBase
             return BadRequest(new { error = "Invalid driver name" });
         }
 
-        return CreatedAtAction(nameof(GetById), DriverMapper.ToResponse(driverCreated));
+        return CreatedAtAction(nameof(GetById), new { id = driverCreated.Id }, DriverMapper.ToResponse(driverCreated));
     }
 
     [HttpDelete("{id:guid}")]

@@ -33,7 +33,7 @@ public class TeamController : ControllerBase
             return Conflict(new { error = "A team with this name already exists." });
         }
 
-        return CreatedAtAction(nameof(GetById),TeamMapper.ToResponse(teamCreated));
+        return CreatedAtAction(nameof(GetById), new { id = teamCreated.Id }, TeamMapper.ToResponse(teamCreated));
     }
 
     [HttpGet("{id:guid}")]

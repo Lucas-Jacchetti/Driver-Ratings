@@ -6,11 +6,11 @@ namespace backend.Feature.Users;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController : ControllerBase
+public class UserController : ControllerBase
 {
     private readonly IUserService _service;
 
-    public UsersController(IUserService service)
+    public UserController(IUserService service)
     {
         _service = service;
     }
