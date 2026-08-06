@@ -1,5 +1,6 @@
 using backend.Domain.Common;
 using backend.Domain.Entities;
+using backend.Feature.Ratings.Contracts;
 
 namespace backend.Domain.Interfaces;
 
@@ -9,5 +10,5 @@ public interface IRatingService
     Task<Result<Rating>> CreateAsync(Rating rating);
     Task<Rating?> GetByIdAsync(Guid id);
     Task<Rating?> DeleteAsync(Guid ratingId);
-    Task<Result<ICollection<Rating>>> CreateRaceRatingsAsync();
+    Task<Result<ICollection<Rating>>> CreateRaceRatingsAsync(RaceRatingSubmission raceRatingSubmission);
 }

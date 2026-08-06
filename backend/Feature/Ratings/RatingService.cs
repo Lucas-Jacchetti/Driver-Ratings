@@ -2,6 +2,7 @@ using backend.Data;
 using backend.Domain.Common;
 using backend.Domain.Entities;
 using backend.Domain.Interfaces;
+using backend.Feature.Ratings.Contracts;
 using backend.Feature.Ratings.DataManipulation;
 using Microsoft.EntityFrameworkCore;
 namespace backend.Feature.Ratings;
@@ -17,8 +18,6 @@ public class RatingService : IRatingService
 
     public async Task<Result<Rating>> CreateAsync(Rating rating)
     {
-        
-            
         var userExists = await _dbContext.Users.AnyAsync(d => d.Id == rating.UserId);
         if (!userExists)
         {
@@ -55,9 +54,67 @@ public class RatingService : IRatingService
         return Result<Rating>.Success(created!);
     }
 
-    public Task<Result<ICollection<Rating>>> CreateRaceRatingsAsync()
+    public async Task<Result<ICollection<Rating>>> CreateRaceRatingsAsync(RaceRatingSubmission submission)
     {
-        throw new NotImplementedException();
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        try
+        {
+            var driverRaceResultIds = submission.Ratings.Select(r => r.DriverRaceResultId)
+                .ToList();
+
+            var driverRaceResults = await _dbContext.DriverRaceResults.Where(drr => driverRaceResultIds.Contains(drr.Id))
+                .ToListAsync();
+
+            var race = await _dbContext.Races.FirstOrDefaultAsync(r => r.Id == submission.RaceId);
+            if (race is null)
+            {
+                return Result<ICollection<Rating>>.Failure("Race not found.");
+            }
+
+            var ratingsOpenAt = race.Date.AddHours(Race.DurationHours);
+            if (DateTime.UtcNow < ratingsOpenAt)
+            {
+                return Result<ICollection<Rating>>.Failure($"Ratings for this race open at {ratingsOpenAt:u}.");
+            }
+
+            if (driverRaceResults.Count != driverRaceResultIds.Count)
+            {
+                return Result<ICollection<Rating>>.Failure("One or more race results were not found.");
+            }
+
+            var alreadyRated = await _dbContext.Ratings.AnyAsync(r => r.UserId == submission.UserId && r.DriverRaceResult.RaceId == submission.RaceId);
+            if (alreadyRated)
+            {
+                return Result<ICollection<Rating>>.Failure("Race already rated.");
+            }
+
+            var validIds = await _dbContext.DriverRaceResults
+                .Where(drr => drr.RaceId == submission.RaceId)
+                .Select(drr => drr.Id)
+                .ToHashSetAsync();
+
+            foreach (var rating in submission.Ratings)
+            {
+                if (!validIds.Contains(rating.DriverRaceResultId))
+                {
+                    return Result<ICollection<Rating>>.Failure("Invalid driver race result.");
+                }
+            }
+
+            _dbContext.Ratings.AddRange(submission.Ratings);
+
+            await _dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return Result<ICollection<Rating>>.Success(submission.Ratings);
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+
+            return Result<ICollection<Rating>>
+                .Failure("An error occurred while saving the ratings.");
+        }
     }
 
     public async Task<Rating?> DeleteAsync(Guid ratingId)

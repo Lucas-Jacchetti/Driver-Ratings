@@ -1,5 +1,8 @@
 using System.Security.Claims;
+using backend.Domain.Entities;
 using backend.Domain.Interfaces;
+using backend.Domain.ValueObjects;
+using backend.Feature.Ratings.Contracts;
 using backend.Feature.Ratings.DataManipulation;
 using Microsoft.AspNetCore.Mvc;
 
@@ -51,6 +54,41 @@ public class RatingController : ControllerBase
 
         var response = RatingMapper.ToResponse(result.Value!);
         return CreatedAtAction(nameof(GetById),new { id = response.Id }, response);
+    }
+
+    [HttpPost("race")]
+    public async Task<IActionResult> RaceRatings(
+        RaceRatingCreationDTO request)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var ratings = request.Ratings
+            .Select(r => new Rating{
+                UserId = userId,
+                DriverRaceResultId = r.DriverRaceResultId,
+                Score = Score.Create(r.Score)
+            })
+            .ToList();
+
+        var submission = new RaceRatingSubmission
+        {
+            UserId = userId,
+            RaceId = request.RaceId,
+            Ratings = ratings
+        };
+
+        var result = await _service.CreateRaceRatingsAsync(submission);
+
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        var response = result.Value!
+            .Select(RatingMapper.ToResponse)
+            .ToList();
+
+        return Ok(response);
     }
 
     [HttpDelete("{id:guid}")]
