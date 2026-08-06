@@ -2,6 +2,7 @@ namespace backend.Domain.Entities;
 
 public class Race
 {
+    public const int DurationHours = 4;
     public Guid Id { get; set; }
     public required string Name { get; set; }
     public required string Circuit { get; set; }

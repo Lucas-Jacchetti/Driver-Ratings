@@ -17,6 +17,8 @@ public class RatingService : IRatingService
 
     public async Task<Result<Rating>> CreateAsync(Rating rating)
     {
+        
+            
         var userExists = await _dbContext.Users.AnyAsync(d => d.Id == rating.UserId);
         if (!userExists)
         {
@@ -29,10 +31,21 @@ public class RatingService : IRatingService
             return Result<Rating>.Failure("Driver race result not found.");
         }
 
-        var validScore = rating.Score.Value >= 0 && rating.Score.Value >= 10;
-        if (!validScore)
+        var driverRaceResult = await _dbContext.DriverRaceResults
+            .Include(drr => drr.Race)
+            .FirstOrDefaultAsync(drr => drr.Id == rating.DriverRaceResultId);
+
+        var ratingsOpenAt = driverRaceResult!.Race.Date.AddHours(Race.DurationHours);
+        if (DateTime.UtcNow < ratingsOpenAt)
         {
-            return Result<Rating>.Failure("Invalid score.");
+            return Result<Rating>.Failure($"Ratings for this race open at {ratingsOpenAt:u}.");
+        }
+
+        var alreadyRated = await _dbContext.Ratings
+            .AnyAsync(r => r.UserId == rating.UserId && r.DriverRaceResultId == rating.DriverRaceResultId);
+        if (alreadyRated)
+        {
+            return Result<Rating>.Failure("You already rated this driver for this race.");
         }
 
         _dbContext.Ratings.Add(rating);

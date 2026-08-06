@@ -8,7 +8,13 @@ public static class RatingQueryExtensions
     public static IQueryable<Rating> IncludeForMapping(
         this IQueryable<Rating> query) =>
         query
-            .Include(ds => ds.User)
-            .Include(ds => ds.DriverRaceResult)
-            .Include(ds => ds.Score);
+            .Include(r => r.User)
+            .Include(r => r.DriverRaceResult)
+                .ThenInclude(drr => drr.DriverSeason)
+                    .ThenInclude(ds => ds.Driver)
+            .Include(r => r.DriverRaceResult)
+                .ThenInclude(drr => drr.DriverSeason)
+                    .ThenInclude(ds => ds.Team)
+            .Include(r => r.DriverRaceResult)
+                .ThenInclude(drr => drr.Race);
 }

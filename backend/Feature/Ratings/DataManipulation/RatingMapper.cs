@@ -10,9 +10,15 @@ public static class RatingMapper
     public static RatingResponseDTO ToResponse(Rating rating) =>
         new(
             rating.Id,
-            UserMapper.ToSummary(rating.User),
-            DriverRaceResultMapper.ToSummary(rating.DriverRaceResult),
             rating.Score.Value,
+            rating.UserId,
+            rating.User.Name,
+            rating.DriverRaceResult.StartingPosition,
+            rating.DriverRaceResult.FinishingPosition,
+            rating.DriverRaceResult.Context,
+            rating.DriverRaceResult.DriverSeason.Driver.Name,
+            rating.DriverRaceResult.DriverSeason.Team.Name,
+            rating.DriverRaceResult.Race.Name,
             rating.RatedAt
         );
 

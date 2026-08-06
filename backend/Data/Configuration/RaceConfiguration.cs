@@ -11,6 +11,11 @@ public class RaceConfiguration : IEntityTypeConfiguration<Race>
         builder.Property(r => r.Name).IsRequired().HasMaxLength(150);
         builder.Property(r => r.Circuit).IsRequired().HasMaxLength(150);
 
+
+        builder.Property(r => r.Date)
+            .HasColumnType("timestamptz")
+            .IsRequired();
+
         builder.HasOne(r => r.Season)
             .WithMany(s => s.Races)
             .HasForeignKey(r => r.SeasonId)

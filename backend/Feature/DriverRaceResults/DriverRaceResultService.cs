@@ -23,8 +23,8 @@ public class DriverRaceResultService : IDriverRaceResultService
             return Result<DriverRaceResult>.Failure("Race not found.");
         }
 
-        var driverSeasonExists = await _dbContext.DriverSeasons.AnyAsync(ds => ds.DriverId == driverRaceResult.DriverSeasonId);
-        if (driverSeasonExists)
+        var driverSeasonExists = await _dbContext.DriverSeasons.AnyAsync(ds => ds.Id == driverRaceResult.DriverSeasonId);
+        if (!driverSeasonExists)
         {
             return Result<DriverRaceResult>.Failure("This driver already has a team assigned for this season.");
         }

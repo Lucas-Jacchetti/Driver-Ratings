@@ -3,6 +3,7 @@ using backend.Domain.Interfaces;
 using backend.Feature.Auth;
 using backend.Feature.DriverRaceResults;
 using backend.Feature.Drivers;
+using backend.Feature.DriverSeasons;
 using backend.Feature.Groups.Communities;
 using backend.Feature.Groups.CommunityMembers;
 using backend.Feature.Races;
@@ -28,6 +29,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IRaceService, RaceService>();
 builder.Services.AddScoped<IDriverService, DriverService>();
+builder.Services.AddScoped<IDriverSeasonService, DriverSeasonService>();
 builder.Services.AddScoped<IDriverRaceResultService, DriverRaceResultService>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
