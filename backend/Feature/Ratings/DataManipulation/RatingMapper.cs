@@ -13,9 +13,6 @@ public static class RatingMapper
             rating.Score.Value,
             rating.UserId,
             rating.User.Name,
-            rating.DriverRaceResult.StartingPosition,
-            rating.DriverRaceResult.FinishingPosition,
-            rating.DriverRaceResult.Context,
             rating.DriverRaceResult.DriverSeason.Driver.Name,
             rating.DriverRaceResult.DriverSeason.Team.Name,
             rating.DriverRaceResult.Race.Name,
@@ -25,10 +22,10 @@ public static class RatingMapper
     public static RatingSummaryDTO ToSummary(Rating rating) =>
         new(rating.Id, UserMapper.ToSummary(rating.User), rating.Score.Value, rating.RatedAt);
 
-    public static Rating ToDomain(RatingCreationDTO ratingCreationDTO) =>
+    public static Rating ToDomain(RatingCreationDTO ratingCreationDTO, Guid userId) =>
         new()
         {
-            UserId = ratingCreationDTO.UserId,
+            UserId = userId,
             DriverRaceResultId = ratingCreationDTO.DriverRaceResultId,
             Score = Score.Create(ratingCreationDTO.Score),
         };

@@ -7,14 +7,14 @@ namespace backend.Feature.Groups.Communities.DataManipulation;
 
 public static class CommunityMapper
 {
-    public static Community ToDomain(CommunityCreationDTO dto)
+    public static Community ToDomain(CommunityCreationDTO dto, Guid hostId)
     {
         return new Community
         {
             Name = dto.Name,
             AccessCode = GenerateCode(dto.IsPublic),
             Description = dto.Description,
-            HostId = dto.HostId,
+            HostId = hostId,
             IsPublic = dto.IsPublic,
             ImgUrl = dto.ImgUrl
         };

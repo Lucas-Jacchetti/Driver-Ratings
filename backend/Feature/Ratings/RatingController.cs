@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using backend.Domain.Interfaces;
 using backend.Feature.Ratings.DataManipulation;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +39,9 @@ public class RatingController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(RatingCreationDTO request)
     {
-        var rating = RatingMapper.ToDomain(request);
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var rating = RatingMapper.ToDomain(request, userId);
         var result = await _service.CreateAsync(rating);
 
         if (!result.IsSuccess)

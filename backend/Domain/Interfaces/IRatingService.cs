@@ -9,4 +9,5 @@ public interface IRatingService
     Task<Result<Rating>> CreateAsync(Rating rating);
     Task<Rating?> GetByIdAsync(Guid id);
     Task<Rating?> DeleteAsync(Guid ratingId);
+    Task<Result<ICollection<Rating>>> CreateRaceRatingsAsync();
 }

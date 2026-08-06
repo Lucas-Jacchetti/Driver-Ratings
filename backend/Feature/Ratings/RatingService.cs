@@ -55,6 +55,11 @@ public class RatingService : IRatingService
         return Result<Rating>.Success(created!);
     }
 
+    public Task<Result<ICollection<Rating>>> CreateRaceRatingsAsync()
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<Rating?> DeleteAsync(Guid ratingId)
     {
         var rating = await _dbContext.Ratings.FindAsync(ratingId);

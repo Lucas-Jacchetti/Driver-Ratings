@@ -5,12 +5,12 @@ namespace backend.Feature.Groups.CommunityMembers.DataManipulation;
 
 public static class CommunityMemberMapper
 {
-    public static CommunityMember ToDomain(CommunityMemberCreationDTO dto)
+    public static CommunityMember ToDomain(CommunityMemberCreationDTO dto, Guid userId)
     {
         return new CommunityMember
         {
             CommunityId = dto.CommunityId,
-            UserId = dto.UserId
+            UserId = userId
         };
     }
 

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using backend.Domain.Interfaces;
 using backend.Feature.Groups.Communities.DataManipulation;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +39,8 @@ public class CommunityController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CommunityCreationDTO request)
     {
-        var community = CommunityMapper.ToDomain(request);
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var community = CommunityMapper.ToDomain(request, userId);
         var result = await _service.CreateAsync(community);
 
         if (!result.IsSuccess)

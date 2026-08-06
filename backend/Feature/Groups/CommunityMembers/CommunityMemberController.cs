@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using backend.Domain.Interfaces;
 using backend.Feature.Groups.CommunityMembers.DataManipulation;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +39,9 @@ public class CommunityMemberController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CommunityMemberCreationDTO request)
     {
-        var communityMember = CommunityMemberMapper.ToDomain(request);
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        
+        var communityMember = CommunityMemberMapper.ToDomain(request, userId);
         var result = await _service.CreateAsync(communityMember, request.AccessToken);
 
         if (!result.IsSuccess)
