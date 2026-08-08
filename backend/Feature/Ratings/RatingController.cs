@@ -4,6 +4,7 @@ using backend.Domain.Interfaces;
 using backend.Domain.ValueObjects;
 using backend.Feature.Ratings.Contracts;
 using backend.Feature.Ratings.DataManipulation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Feature.Ratings;
@@ -39,6 +40,7 @@ public class RatingController : ControllerBase
         return Ok(RatingMapper.ToResponse(rating));
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(RatingCreationDTO request)
     {
