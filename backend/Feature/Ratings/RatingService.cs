@@ -144,4 +144,22 @@ public class RatingService : IRatingService
             .IncludeForMapping()
             .FirstOrDefaultAsync(r => r.Id == id);
     }
+
+    public async Task<ICollection<DriverSeasonRating>> GetSeasonRatingsAsync(Guid seasonId)
+    {
+        return await _dbContext.Ratings
+            .Where(r =>
+                r.DriverRaceResult.DriverSeason.SeasonId == seasonId)
+            .GroupBy(r => new
+            {
+                r.DriverRaceResult.DriverSeasonId,
+                DriverName = r.DriverRaceResult.DriverSeason.Driver.Name
+            })
+            .Select(g => new DriverSeasonRating(
+                g.Key.DriverSeasonId,
+                g.Key.DriverName,
+                g.Average(r => r.Score.Value)
+            ))
+            .ToListAsync();
+    }
 }

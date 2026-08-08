@@ -91,6 +91,22 @@ public class RatingController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("season/{seasonId:guid}")]
+    public async Task<IActionResult> GetSeasonRatings(Guid seasonId)
+    {
+        var ratings = await _service.GetSeasonRatingsAsync(seasonId);
+
+        var response = ratings
+            .Select(r => new DriverSeasonRating(
+                r.DriverSeasonId,
+                r.DriverName,
+                r.AverageRating
+            ))
+            .ToList();
+
+        return Ok(response);
+    }
+
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
