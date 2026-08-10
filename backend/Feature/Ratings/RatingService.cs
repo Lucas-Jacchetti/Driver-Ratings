@@ -148,13 +148,21 @@ public class RatingService : IRatingService
     public async Task<ICollection<DriverSeasonRating>> GetSeasonRatingsAsync(Guid seasonId)
     {
         return await _dbContext.Ratings
-            .Where(r =>
-                r.DriverRaceResult.DriverSeason.SeasonId == seasonId)
-            .GroupBy(r => new
-            {
-                r.DriverRaceResult.DriverSeasonId,
-                DriverName = r.DriverRaceResult.DriverSeason.Driver.Name
-            })
+            .Where(r => r.DriverRaceResult.DriverSeason.SeasonId == seasonId)
+            .GroupBy(r => new {r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name})
+            .Select(g => new DriverSeasonRating(
+                g.Key.DriverSeasonId,
+                g.Key.DriverName,
+                g.Average(r => r.Score.Value)
+            ))
+            .ToListAsync();
+    }
+
+    public async Task<ICollection<DriverSeasonRating>> GetUserRatingsAsync(Guid seasonId, Guid userId)
+    {
+        return await _dbContext.Ratings
+            .Where(r => r.DriverRaceResult.DriverSeason.SeasonId == seasonId && r.UserId == userId)
+            .GroupBy(r => new {r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name})
             .Select(g => new DriverSeasonRating(
                 g.Key.DriverSeasonId,
                 g.Key.DriverName,

@@ -13,4 +13,5 @@ public interface IRatingService
     Task<Rating?> DeleteAsync(Guid ratingId);
     Task<Result<ICollection<Rating>>> CreateRaceRatingsAsync(RaceRatingSubmission raceRatingSubmission);
     Task<ICollection<DriverSeasonRating>> GetSeasonRatingsAsync(Guid seasonId);
+    Task<ICollection<DriverSeasonRating>> GetUserRatingsAsync(Guid seasonId, Guid userId);
 }

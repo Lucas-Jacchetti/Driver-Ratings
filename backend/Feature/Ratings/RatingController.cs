@@ -59,8 +59,7 @@ public class RatingController : ControllerBase
     }
 
     [HttpPost("race")]
-    public async Task<IActionResult> RaceRatings(
-        RaceRatingCreationDTO request)
+    public async Task<IActionResult> RaceRatings(RaceRatingCreationDTO request)
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
@@ -97,6 +96,24 @@ public class RatingController : ControllerBase
     public async Task<IActionResult> GetSeasonRatings(Guid seasonId)
     {
         var ratings = await _service.GetSeasonRatingsAsync(seasonId);
+
+        var response = ratings
+            .Select(r => new DriverSeasonRating(
+                r.DriverSeasonId,
+                r.DriverName,
+                r.AverageRating
+            ))
+            .ToList();
+
+        return Ok(response);
+    }
+
+    [Authorize]
+    [HttpGet("season/user/{seasonId:guid}")]
+    public async Task<IActionResult> GetUserRatings(Guid seasonId)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var ratings = await _service.GetUserRatingsAsync(seasonId, userId);
 
         var response = ratings
             .Select(r => new DriverSeasonRating(
