@@ -50,6 +50,19 @@ public class DriverRaceResultController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
     }
 
+    [HttpPut("race/{raceId:guid}")]
+    public async Task<IActionResult> UpdateRaceResults(Guid raceId, DriverRaceResultSubmissionRequest request)
+    {
+        var result = await _service.UpdateDriverRaceResultsAsync(raceId, request);
+
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        return Ok(result.Value);
+    }
+
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

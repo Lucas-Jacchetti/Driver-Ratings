@@ -1,4 +1,5 @@
 using backend.Data;
+using backend.Domain.Common;
 using backend.Domain.Entities;
 using backend.Domain.Interfaces;
 using backend.Feature.Races.DataManipulation;
@@ -23,6 +24,24 @@ public class RaceService : IRaceService
         }
 
         _dbContext.Races.Add(race);
+
+        var driverSeasonIds = await _dbContext.DriverSeasons
+            .Where(ds => ds.SeasonId == race.SeasonId)
+            .Select(ds => ds.Id)
+            .ToListAsync();
+
+        foreach (var driverSeasonId in driverSeasonIds)
+        {
+            _dbContext.DriverRaceResults.Add(new DriverRaceResult
+            {
+                DriverSeasonId = driverSeasonId,
+                RaceId = race.Id,
+                StartingPosition = 0,
+                FinishingPosition = 0,
+                Context = string.Empty
+            });
+        }
+
         await _dbContext.SaveChangesAsync();
 
         return await GetByIdAsync(race.Id);
