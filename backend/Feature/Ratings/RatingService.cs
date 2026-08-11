@@ -104,9 +104,18 @@ public class RatingService : IRatingService
             _dbContext.Ratings.AddRange(submission.Ratings);
 
             await _dbContext.SaveChangesAsync();
+
+            var savedRatings = await _dbContext.Ratings
+                .Where(r => submission.Ratings
+                    .Select(sr => sr.Id)
+                    .Contains(r.Id))
+                .IncludeForMapping()
+                .ToListAsync();
+
             await transaction.CommitAsync();
 
-            return Result<ICollection<Rating>>.Success(submission.Ratings);
+            return Result<ICollection<Rating>>
+                .Success(savedRatings);
         }
         catch
         {
@@ -150,10 +159,11 @@ public class RatingService : IRatingService
         return await _dbContext.Ratings
             .Where(r => r.DriverRaceResult.DriverSeason.SeasonId == seasonId)
             .GroupBy(r => new {r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name})
+            .OrderByDescending(g => g.Average(r => r.Score.Value))
             .Select(g => new DriverSeasonRating(
                 g.Key.DriverSeasonId,
                 g.Key.DriverName,
-                g.Average(r => r.Score.Value)
+                Math.Round(g.Average(r => r.Score.Value), 2)
             ))
             .ToListAsync();
     }
@@ -163,10 +173,11 @@ public class RatingService : IRatingService
         return await _dbContext.Ratings
             .Where(r => r.DriverRaceResult.DriverSeason.SeasonId == seasonId && r.UserId == userId)
             .GroupBy(r => new {r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name})
+            .OrderByDescending(g => g.Average(r => r.Score.Value))
             .Select(g => new DriverSeasonRating(
                 g.Key.DriverSeasonId,
                 g.Key.DriverName,
-                g.Average(r => r.Score.Value)
+                Math.Round(g.Average(r => r.Score.Value), 2)
             ))
             .ToListAsync();
     }
