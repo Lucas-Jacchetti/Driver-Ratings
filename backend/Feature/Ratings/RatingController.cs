@@ -101,12 +101,30 @@ public class RatingController : ControllerBase
         return Ok(ratings);
     }
 
+    [HttpGet("race/{raceId:guid}")]
+    public async Task<IActionResult> GetRaceRatings(Guid raceId)
+    {
+        var ratings = await _service.GetRaceRatingsAsync(raceId);
+
+        return Ok(ratings);
+    }
+
     [Authorize]
     [HttpGet("season/user/{seasonId:guid}")]
     public async Task<IActionResult> GetUserRatings(Guid seasonId)
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var ratings = await _service.GetUserRatingsAsync(seasonId, userId);
+
+        return Ok(ratings);
+    }
+
+    [Authorize]
+    [HttpGet("race/user/{raceId:guid}")]
+    public async Task<IActionResult> GetUserRaceRatings(Guid raceId)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var ratings = await _service.GetUserRaceRatingsAsync(raceId, userId);
 
         return Ok(ratings);
     }

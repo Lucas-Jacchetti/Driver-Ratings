@@ -14,4 +14,7 @@ public interface IRatingService
     Task<Result<ICollection<Rating>>> CreateRaceRatingsAsync(RaceRatingSubmission raceRatingSubmission);
     Task<ICollection<DriverSeasonRating>> GetSeasonRatingsAsync(Guid seasonId);
     Task<ICollection<DriverSeasonRating>> GetUserRatingsAsync(Guid seasonId, Guid userId);
+    Task<ICollection<DriverSeasonRating>> GetRaceRatingsAsync(Guid raceId);
+    Task<ICollection<DriverSeasonRating>> GetUserRaceRatingsAsync(Guid raceId, Guid userId);
+
 }
