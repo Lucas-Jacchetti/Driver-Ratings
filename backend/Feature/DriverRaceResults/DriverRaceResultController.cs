@@ -35,6 +35,19 @@ public class DriverRaceResultController : ControllerBase
         return Ok(DriverRaceResultMapper.ToResponse(driverRaceResult));
     }
 
+    [HttpGet("race/{raceId:guid}")]
+    public async Task<IActionResult> GetByRaceId(Guid raceId)
+    {
+        var driverRaceResult = await _service.GetByIdAsync(raceId);
+
+        if (driverRaceResult is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(DriverRaceResultMapper.ToResponse(driverRaceResult));
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create(DriverRaceResultCreationDTO request)
     {
@@ -60,7 +73,11 @@ public class DriverRaceResultController : ControllerBase
             return BadRequest(new { error = result.Error });
         }
 
-        return Ok(result.Value);
+        var response = result.Value!
+            .Select(DriverRaceResultMapper.ToResponse)
+            .ToList();
+
+        return Ok(response);
     }
 
     [HttpDelete("{id:guid}")]

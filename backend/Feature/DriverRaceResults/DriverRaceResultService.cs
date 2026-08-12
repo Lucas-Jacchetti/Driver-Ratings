@@ -119,4 +119,11 @@ public class DriverRaceResultService : IDriverRaceResultService
             .IncludeForMapping()
             .FirstOrDefaultAsync(r => r.Id == id);
     }
+
+    public async Task<DriverRaceResult?> GetByRaceIdAsync(Guid raceId)
+    {
+        return await _dbContext.DriverRaceResults
+            .IncludeForMapping()
+            .FirstOrDefaultAsync(r => r.RaceId == raceId);
+    }
 }
