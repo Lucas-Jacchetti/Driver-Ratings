@@ -1,5 +1,6 @@
 using backend.Domain.Interfaces;
 using backend.Feature.Races.DataManipulation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Feature.Races;
@@ -35,6 +36,7 @@ public class RaceController : ControllerBase
         return Ok(RaceMapper.ToResponse(race));
     }
 
+    [Authorize] //admin
     [HttpPost]
     public async Task<IActionResult> Create(RaceCreationDTO request)
     {
@@ -49,6 +51,7 @@ public class RaceController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = raceCreated.Id }, RaceMapper.ToResponse(raceCreated));
     }
 
+    [Authorize] //admin
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

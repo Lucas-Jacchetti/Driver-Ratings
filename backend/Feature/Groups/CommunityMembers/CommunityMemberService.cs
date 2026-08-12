@@ -17,13 +17,13 @@ public class CommunityMemberService : ICommunityMemberService
 
     public async Task<Result<CommunityMember>> CreateAsync(CommunityMember communityMember, string? accessToken)
     {
-        var userExists = await _dbContext.CommunityMembers.AnyAsync(ds => ds.UserId == communityMember.UserId);
+        var userExists = await _dbContext.Users.AnyAsync(ds => ds.Id == communityMember.UserId);
         if (!userExists)
         {
             return Result<CommunityMember>.Failure("User not found.");
         }
 
-        var communityExists = await _dbContext.CommunityMembers.AnyAsync(ds => ds.CommunityId == communityMember.CommunityId);
+        var communityExists = await _dbContext.Communities.AnyAsync(ds => ds.Id == communityMember.CommunityId);
         if (!communityExists)
         {
             return Result<CommunityMember>.Failure("Community not found.");

@@ -1,5 +1,6 @@
 using backend.Domain.Interfaces;
 using backend.Feature.DriverRaceResults.DataManipulation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Feature.DriverRaceResults;
@@ -38,7 +39,7 @@ public class DriverRaceResultController : ControllerBase
     [HttpGet("race/{raceId:guid}")]
     public async Task<IActionResult> GetByRaceId(Guid raceId)
     {
-        var driverRaceResult = await _service.GetByIdAsync(raceId);
+        var driverRaceResult = await _service.GetByRaceIdAsync(raceId);
 
         if (driverRaceResult is null)
         {
@@ -48,6 +49,7 @@ public class DriverRaceResultController : ControllerBase
         return Ok(DriverRaceResultMapper.ToResponse(driverRaceResult));
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(DriverRaceResultCreationDTO request)
     {
@@ -63,6 +65,7 @@ public class DriverRaceResultController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
     }
 
+    [Authorize]
     [HttpPut("race/{raceId:guid}")]
     public async Task<IActionResult> UpdateRaceResults(Guid raceId, DriverRaceResultSubmissionRequest request)
     {
@@ -80,6 +83,7 @@ public class DriverRaceResultController : ControllerBase
         return Ok(response);
     }
 
+    [Authorize]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

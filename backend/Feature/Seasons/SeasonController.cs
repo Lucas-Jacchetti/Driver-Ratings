@@ -1,5 +1,6 @@
 using backend.Domain.Interfaces;
 using backend.Feature.Seasons.DataManipulation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Feature.Seasons;
@@ -35,6 +36,7 @@ public class SeasonController : ControllerBase
         return Ok(SeasonMapper.ToResponse(season));
     }
 
+    [Authorize] //admin
     [HttpPost]
     public async Task<IActionResult> Create(SeasonCreationDTO request)
     {
@@ -49,6 +51,7 @@ public class SeasonController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = seasonCreated.Id }, SeasonMapper.ToResponse(seasonCreated));
     }
 
+    [Authorize] //admin
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

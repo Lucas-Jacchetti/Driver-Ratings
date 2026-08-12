@@ -17,13 +17,11 @@ public class CommunityService : ICommunityService
 
     public async Task<Result<Community>> CreateAsync(Community community)
     {
-        var hostExists = await _dbContext.Communities.AnyAsync(ds => ds.HostId == community.HostId);
+        var hostExists = await _dbContext.Users.AnyAsync(ds => ds.Id == community.HostId);
         if (!hostExists)
         {
             return Result<Community>.Failure("Host not found.");
         }
-
-
 
         _dbContext.Communities.Add(community);
         await _dbContext.SaveChangesAsync();

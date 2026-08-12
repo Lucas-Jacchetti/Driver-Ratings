@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using backend.Domain.Interfaces;
 using backend.Feature.Groups.CommunityMembers.DataManipulation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Feature.Groups.CommunityMembers;
@@ -16,6 +17,7 @@ public class CommunityMemberController : ControllerBase
         _service = service;
     }
 
+    [Authorize] //admin
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -23,6 +25,7 @@ public class CommunityMemberController : ControllerBase
         return Ok(communityMember.Select(CommunityMemberMapper.ToResponse).ToList());
     }
 
+    [Authorize] //admin
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -36,6 +39,7 @@ public class CommunityMemberController : ControllerBase
         return Ok(CommunityMemberMapper.ToResponse(communityMember));
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(CommunityMemberCreationDTO request)
     {
@@ -53,6 +57,7 @@ public class CommunityMemberController : ControllerBase
         return CreatedAtAction(nameof(GetById), response);
     }
 
+    [Authorize] //admin
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

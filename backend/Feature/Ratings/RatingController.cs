@@ -20,6 +20,7 @@ public class RatingController : ControllerBase
         _service = service;
     }
 
+    [Authorize] //admin
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -27,6 +28,7 @@ public class RatingController : ControllerBase
         return Ok(ratings.Select(RatingMapper.ToResponse).ToList());
     }
 
+    [Authorize] //admin
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -129,6 +131,7 @@ public class RatingController : ControllerBase
         return Ok(ratings);
     }
 
+    [Authorize] //admin
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

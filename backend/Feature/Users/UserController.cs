@@ -1,5 +1,6 @@
 using backend.Domain.Interfaces;
 using backend.Feature.Users.DataManipulation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Feature.Users;
@@ -15,6 +16,7 @@ public class UserController : ControllerBase
         _service = service;
     }
 
+    [Authorize] //admin
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -22,6 +24,7 @@ public class UserController : ControllerBase
         return Ok(users.Select(UserMapper.ToResponse).ToList());
     }
 
+    [Authorize] //admin
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -35,6 +38,7 @@ public class UserController : ControllerBase
         return Ok(UserMapper.ToResponse(user));
     }
 
+    [Authorize] //admin
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

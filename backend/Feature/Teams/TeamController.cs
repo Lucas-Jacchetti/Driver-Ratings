@@ -1,5 +1,6 @@
 using backend.Domain.Interfaces;
 using backend.Feature.Teams.DataManipulation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Feature.Teams;
@@ -22,6 +23,7 @@ public class TeamController : ControllerBase
         return Ok(TeamMapper.ToResponse(teams));
     }
 
+    [Authorize] //admin
     [HttpPost]
     public async Task<IActionResult> Create(TeamCreationDTO request)
     {
@@ -49,6 +51,7 @@ public class TeamController : ControllerBase
         return Ok(TeamMapper.ToResponse(team));
     }
 
+    [Authorize] //admin
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

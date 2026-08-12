@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using backend.Domain.Interfaces;
 using backend.Feature.Groups.Communities.DataManipulation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Feature.Groups.Communities;
@@ -36,6 +37,7 @@ public class CommunityController : ControllerBase
         return Ok(CommunityMapper.ToResponse(community));
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(CommunityCreationDTO request)
     {
@@ -52,6 +54,7 @@ public class CommunityController : ControllerBase
         return CreatedAtAction(nameof(GetById), response);
     }
 
+    [Authorize]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
