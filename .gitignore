@@ -12,3 +12,11 @@
 .env
 appsettings.Development.json
 appsettings.json
+
+README.md
+node_modules/
+package-lock.json
+
+frontend/src/app/shared/mock/
+/dist
+.angular

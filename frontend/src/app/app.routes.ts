@@ -10,8 +10,17 @@ export const routes: Routes = [
       ),
   },
   {
+    path: '',
+    pathMatch: 'full',
+    //ScanActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/home/pages/home-page/home-page.component').then(
+        (m) => m.HomePageComponent
+      ),
+  },
+  {
     path: 'races',
-    canActivate: [authGuard],
+    //canActivate: [authGuard],
     loadComponent: () =>
       import('./features/races/pages/races-page/races-page.component').then(
         (m) => m.RacesPageComponent
@@ -19,7 +28,7 @@ export const routes: Routes = [
   },
   {
     path: 'races/:id',
-    canActivate: [authGuard],
+    //canActivate: [authGuard],
     loadComponent: () =>
       import('./features/races/pages/race-detail-page/race-detail-page.component').then(
         (m) => m.RaceDetailPageComponent
@@ -27,7 +36,7 @@ export const routes: Routes = [
   },
   {
     path: 'races/:id/rate',
-    canActivate: [authGuard],
+    //canActivate: [authGuard],
     loadComponent: () =>
       import('./features/ratings/pages/rate-race-page/rate-race-page.component').then(
         (m) => m.RateRacePageComponent
@@ -35,7 +44,7 @@ export const routes: Routes = [
   },
   {
     path: 'drivers',
-    canActivate: [authGuard],
+    //canActivate: [authGuard],
     loadComponent: () =>
       import('./features/drivers/pages/drivers-page/drivers-page.component').then(
         (m) => m.DriversPageComponent
@@ -43,7 +52,7 @@ export const routes: Routes = [
   },
   {
     path: 'seasons',
-    canActivate: [authGuard],
+    //canActivate: [authGuard],
     loadComponent: () =>
       import('./features/seasons/pages/seasons-page/seasons-page.component').then(
         (m) => m.SeasonsPageComponent
@@ -51,7 +60,7 @@ export const routes: Routes = [
   },
   {
     path: 'communities',
-    canActivate: [authGuard],
+    //canActivate: [authGuard],
     loadComponent: () =>
       import('./features/communities/pages/communities-page/communities-page.component').then(
         (m) => m.CommunitiesPageComponent
@@ -59,12 +68,19 @@ export const routes: Routes = [
   },
   {
     path: 'profile',
-    canActivate: [authGuard],
+    //canActivate: [authGuard],
     loadComponent: () =>
       import('./features/users/pages/profile-page/profile-page.component').then(
         (m) => m.ProfilePageComponent
       ),
   },
-  { path: '', redirectTo: 'races', pathMatch: 'full' },
-  { path: '**', redirectTo: 'races' },
+  {
+    path: 'settings',
+    //canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/users/pages/settings-page/settings-page.component').then(
+        (m) => m.SettingsPageComponent
+      ),
+  },
+  { path: '**', redirectTo: '' },
 ];
