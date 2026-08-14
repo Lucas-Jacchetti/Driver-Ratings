@@ -19,7 +19,7 @@ interface PreferenceToggle {
     <h1 class="text-xl font-bold text-white">Configurações</h1>
     <p class="mb-5 text-sm text-gray-500">Preferências da sua conta</p>
 
-    <div class="mb-6 divide-y divide-gray-800 rounded-lg border border-gray-800 bg-gray-900/40">
+    <div class="mb-6 divide-y divide-gray-800 rounded-lg border border-gray-800 bg-[#141414]">
       @for (pref of preferences; track pref.key) {
         <div class="flex items-center justify-between px-5 py-4">
           <div>
@@ -36,7 +36,7 @@ interface PreferenceToggle {
       }
     </div>
 
-    <div class="rounded-lg border border-gray-800 bg-gray-900/40">
+    <div class="rounded-lg border border-gray-800 bg-[#141414]">
       <p class="px-5 pt-4 text-sm font-bold text-white">Conta</p>
       <div class="divide-y divide-gray-800">
         <button type="button" class="flex w-full items-center gap-3 px-5 py-3 text-left text-sm text-gray-300 hover:text-white">

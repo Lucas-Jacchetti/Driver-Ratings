@@ -20,14 +20,14 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
 
       <div class="space-y-2">
         @for (result of race.driverRaceResults; track result.id) {
-          <div class="flex items-center justify-between rounded-lg border border-gray-800 bg-gray-900/40 px-5 py-3">
+          <div class="flex items-center justify-between rounded-lg border border-gray-800 bg-[#141414] px-5 py-3">
             <span class="text-sm text-gray-200">{{ result.driverSeason.driver.name }}</span>
             <input
               type="number"
               min="0"
               max="10"
               step="0.5"
-              class="w-20 bg-gray-800 border border-gray-700 rounded px-2 py-1 text-right text-sm text-white focus:border-red-600 focus:outline-none"
+              class="app-input w-20 px-2 py-1 text-right"
               [(ngModel)]="scores[result.id]"
               name="score-{{ result.id }}"
             />
@@ -35,12 +35,14 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
         }
       </div>
 
-      <button
-        class="mt-6 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-5 py-2.5 rounded-md"
-        (click)="submit()"
-      >
-        Enviar avaliações
-      </button>
+      <div class="mt-6 flex justify-end">
+        <button
+          class="app-button-primary px-5 py-2.5"
+          (click)="submit()"
+        >
+          Enviar avaliações
+        </button>
+      </div>
     }
   `,
 })

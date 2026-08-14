@@ -23,7 +23,7 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
         Avaliar pilotos
       </a>
 
-      <div class="rounded-lg border border-gray-800 bg-gray-900/40 divide-y divide-gray-800">
+      <div class="rounded-lg border border-gray-800 bg-[#141414] divide-y divide-gray-800">
         @for (result of race.driverRaceResults; track result.id) {
           <div class="py-3 px-5 flex justify-between text-sm">
             <span class="text-gray-200">{{ result.driverSeason.driver.name }} ({{ result.driverSeason.team.name }})</span>

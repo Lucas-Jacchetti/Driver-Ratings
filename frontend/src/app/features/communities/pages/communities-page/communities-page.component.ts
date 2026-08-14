@@ -78,7 +78,7 @@ const TABS: Array<CommunityTag | 'Todos'> = ['Todos', 'Geral', 'Piloto', 'Equipe
       <h1 class="text-xl font-bold text-white">Comunidade</h1>
       <button
         type="button"
-        class="flex shrink-0 items-center gap-2 rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+        class="app-button-primary"
         (click)="showJoinModal = true"
       >
         <app-icon name="link" [size]="15" />
@@ -92,14 +92,14 @@ const TABS: Array<CommunityTag | 'Todos'> = ['Todos', 'Geral', 'Piloto', 'Equipe
         <app-icon name="search" [size]="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
         <input
           type="text"
-          class="w-full rounded-md border border-gray-800 bg-gray-900 py-2 pl-9 pr-3 text-sm text-gray-200 placeholder-gray-500 focus:border-red-600 focus:outline-none"
+          class="app-input pl-9 pr-3"
           placeholder="Buscar comunidades..."
           [(ngModel)]="search"
           name="search"
         />
       </div>
 
-      <div class="flex flex-wrap gap-1 rounded-md bg-gray-900 p-1">
+      <div class="flex flex-wrap gap-1 rounded-md bg-[#141414] p-1">
         @for (tab of tabs; track tab) {
           <button
             type="button"
@@ -117,8 +117,8 @@ const TABS: Array<CommunityTag | 'Todos'> = ['Todos', 'Geral', 'Piloto', 'Equipe
 
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
       @for (community of filteredCommunities; track community.id) {
-        <div class="overflow-hidden rounded-lg border border-gray-800 bg-gray-900/40">
-          <div class="relative h-32 bg-gradient-to-br {{ community.gradient }}">
+        <div class="overflow-hidden rounded-lg border border-gray-800 bg-[#141414]">
+          <div class="relative h-32 bg-gradient-to-br" [ngClass]="['bg-gradient-to-br', community.gradient]">
             <span class="absolute right-3 top-3 rounded bg-black/60 px-2 py-1 text-xs font-medium text-gray-200">
               {{ community.tag }}
             </span>
@@ -131,7 +131,7 @@ const TABS: Array<CommunityTag | 'Todos'> = ['Todos', 'Geral', 'Piloto', 'Equipe
                 <app-icon name="users" [size]="14" />
                 {{ community.members | number: '1.0-0' : 'pt-BR' }} membros
               </span>
-              <button type="button" class="rounded-md bg-red-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-red-700">
+              <button type="button" class="app-button-primary px-4 py-1.5 text-xs">
                 Entrar
               </button>
             </div>
@@ -142,12 +142,12 @@ const TABS: Array<CommunityTag | 'Todos'> = ['Todos', 'Geral', 'Piloto', 'Equipe
 
     @if (showJoinModal) {
       <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" (click)="showJoinModal = false">
-        <div class="w-full max-w-sm rounded-lg bg-gray-900 p-6" (click)="$event.stopPropagation()">
+        <div class="w-full max-w-sm rounded-lg bg-[#141414] p-6" (click)="$event.stopPropagation()">
           <h2 class="mb-1 text-lg font-bold text-white">Inserir Código</h2>
           <p class="mb-4 text-sm text-gray-500">Digite o código da comunidade para entrar.</p>
           <input
             type="text"
-            class="mb-5 w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-red-600 focus:outline-none"
+            class="app-input mb-5"
             placeholder="Ex: F1BR-2024-XYZ"
             [(ngModel)]="accessCode"
             name="accessCode"
@@ -155,14 +155,14 @@ const TABS: Array<CommunityTag | 'Todos'> = ['Todos', 'Geral', 'Piloto', 'Equipe
           <div class="flex gap-3">
             <button
               type="button"
-              class="flex-1 rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-700"
+              class="app-button-secondary flex-1"
               (click)="showJoinModal = false"
             >
               Cancelar
             </button>
             <button
               type="button"
-              class="flex-1 rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+              class="app-button-primary flex-1"
               (click)="showJoinModal = false"
             >
               Entrar

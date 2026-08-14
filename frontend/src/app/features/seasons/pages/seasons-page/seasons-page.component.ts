@@ -14,7 +14,7 @@ import { MOCK_SEASON_2024, scoreColorClass } from '../../../../shared/mock/f1-mo
 
     <div class="mb-5 flex flex-wrap items-center gap-3">
       <select
-        class="rounded-md border border-gray-800 bg-gray-900 px-3 py-2 text-sm text-gray-200 focus:border-red-600 focus:outline-none"
+        class="rounded-md border border-gray-800 bg-[#141414] px-3 py-2 text-sm text-gray-200 focus:border-red-600 focus:outline-none"
         [(ngModel)]="selectedYear"
         name="year"
       >
@@ -24,11 +24,11 @@ import { MOCK_SEASON_2024, scoreColorClass } from '../../../../shared/mock/f1-mo
 
       <button
         type="button"
-        class="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium"
+        class="app-button-secondary"
         [class.bg-red-600]="onlyMine"
         [class.text-white]="onlyMine"
-        [class.bg-gray-900]="!onlyMine"
-        [class.text-gray-300]="!onlyMine"
+        [class.border-red-600]="onlyMine"
+        [class.hover:bg-red-700]="onlyMine"
         (click)="onlyMine = !onlyMine"
       >
         <app-icon name="user" [size]="15" />
@@ -36,7 +36,7 @@ import { MOCK_SEASON_2024, scoreColorClass } from '../../../../shared/mock/f1-mo
       </button>
     </div>
 
-    <div class="mb-6 grid grid-cols-2 gap-4 rounded-lg border border-gray-800 bg-gray-900/40 p-4 sm:grid-cols-4">
+    <div class="mb-6 grid grid-cols-2 gap-4 rounded-lg border border-gray-800 bg-[#141414] p-4 sm:grid-cols-4">
       <div>
         <p class="text-xs uppercase tracking-wide text-gray-500">Temporada</p>
         <p class="text-lg font-bold text-white">{{ selectedYear }}</p>
@@ -60,22 +60,28 @@ import { MOCK_SEASON_2024, scoreColorClass } from '../../../../shared/mock/f1-mo
 
     <div class="space-y-2">
       @for (row of drivers; track row.driverId) {
-        <div class="flex items-center gap-4 rounded-lg border border-gray-800 bg-gray-900/40 px-5 py-3">
-          <span class="w-6 shrink-0 text-xs font-semibold text-gray-500">{{ row.flag }}</span>
-          <div class="w-48 shrink-0">
-            <p class="truncate font-semibold text-white">{{ row.name.toUpperCase() }}</p>
-            <p class="flex items-center gap-1.5 text-xs text-gray-500">
-              <span class="h-1.5 w-1.5 rounded-full" [style.background]="row.teamColor"></span>
-              {{ row.team }}
-            </p>
+        <div class="rounded-2xl border border-gray-800 bg-[#141414] px-5 py-4">
+          <div class="flex flex-wrap items-center gap-6">
+            <div class="flex min-w-[220px] items-center gap-3">
+              <span class="shrink-0 text-xl leading-none">{{ row.flag }}</span>
+              <div>
+                <div class="text-base font-black uppercase leading-tight text-white">{{ row.name }}</div>
+                <div class="mt-0.5 flex items-center gap-1.5">
+                  <span class="h-2.5 w-2.5 rounded-[4px] shrink-0 opacity-80" [style.background]="row.teamColor"></span>
+                  <span class="text-xs text-white/50">{{ row.team }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex min-w-[220px] flex-1 items-center gap-4">
+              <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-[#252525]">
+                <div class="h-full rounded-full bg-[#ff1f1f]" [style.width.%]="row.score * 10"></div>
+              </div>
+              <span class="w-12 shrink-0 text-right text-3xl font-black leading-none" [class]="scoreColorClass(row.score)">
+                {{ row.score.toFixed(1) }}
+              </span>
+            </div>
           </div>
-          <span class="w-20 shrink-0 text-center text-xs text-gray-500">P{{ row.startPosition }} → P{{ row.finishPosition }}</span>
-          <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-800">
-            <div class="h-full rounded-full bg-red-600" [style.width.%]="row.score * 10"></div>
-          </div>
-          <span class="w-10 shrink-0 text-right text-base font-bold" [class]="scoreColorClass(row.score)">
-            {{ row.score.toFixed(1) }}
-          </span>
         </div>
       }
     </div>

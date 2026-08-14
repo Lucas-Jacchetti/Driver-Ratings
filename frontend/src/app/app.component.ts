@@ -10,11 +10,11 @@ import { AppTopbarComponent } from './layout/app-topbar/app-topbar.component';
   imports: [RouterOutlet, AppSidebarComponent, AppTopbarComponent],
   template: `
     @if (showShell()) {
-      <div class="flex min-h-screen bg-black text-gray-100">
+      <div class="flex min-h-screen bg-[#111111] text-gray-100">
         <app-sidebar-nav [open]="sidebarOpen()" (openChange)="sidebarOpen.set($event)" />
-        <div class="flex min-w-0 flex-1 flex-col">
+        <div class="flex min-w-0 flex-1 flex-col bg-[#111111]">
           <app-topbar (menuClick)="sidebarOpen.set(true)" />
-          <main class="flex-1 overflow-y-auto p-4 sm:p-6">
+          <main class="flex-1 overflow-y-auto bg-[#111111] p-4 sm:p-6">
             <router-outlet />
           </main>
         </div>

@@ -10,7 +10,7 @@ import { scoreColorClass } from '../../../../shared/mock/f1-mock-data';
     <h1 class="text-xl font-bold text-white">Perfil</h1>
     <p class="mb-5 text-sm text-gray-500">Seu histórico de avaliações</p>
 
-    <div class="mb-6 flex items-center gap-4 rounded-lg border border-gray-800 bg-gray-900/40 p-5">
+    <div class="mb-6 flex items-center gap-4 rounded-lg border border-gray-800 bg-[#141414] p-5">
       <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-red-600 text-xl font-semibold text-white">
         {{ user.initial }}
       </div>
@@ -23,7 +23,7 @@ import { scoreColorClass } from '../../../../shared/mock/f1-mock-data';
 
     <div class="mb-6 grid grid-cols-2 gap-4">
       @for (stat of stats; track stat.label) {
-        <div class="rounded-lg border border-gray-800 bg-gray-900/40 p-4">
+        <div class="rounded-lg border border-gray-800 bg-[#141414] p-4">
           <p class="text-2xl font-bold text-red-500">{{ stat.value }}</p>
           <p class="text-sm text-gray-500">{{ stat.label }}</p>
         </div>
@@ -31,7 +31,7 @@ import { scoreColorClass } from '../../../../shared/mock/f1-mock-data';
     </div>
 
     <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Piloto Favorito</p>
-    <div class="flex items-center gap-3 rounded-lg border border-gray-800 bg-gray-900/40 p-4">
+    <div class="flex items-center gap-3 rounded-lg border border-gray-800 bg-[#141414] p-4">
       <span class="text-xs font-semibold text-gray-500">{{ favoriteDriver.flag }}</span>
       <div class="flex-1">
         <p class="font-semibold text-white">{{ favoriteDriver.name }}</p>
