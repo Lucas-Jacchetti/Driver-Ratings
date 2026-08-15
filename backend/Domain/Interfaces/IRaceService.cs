@@ -7,4 +7,5 @@ public interface IRaceService
     Task<Race?> CreateAsync(Race race);
     Task<Race?> GetByIdAsync(Guid id);
     Task<Race?> DeleteAsync(Guid raceId);
+    Task<Race?> GetCurrentAsync();
 }

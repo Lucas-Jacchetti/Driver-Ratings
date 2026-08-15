@@ -120,10 +120,11 @@ public class DriverRaceResultService : IDriverRaceResultService
             .FirstOrDefaultAsync(r => r.Id == id);
     }
 
-    public async Task<DriverRaceResult?> GetByRaceIdAsync(Guid raceId)
+    public async Task<ICollection<DriverRaceResult>> GetByRaceIdAsync(Guid raceId)
     {
         return await _dbContext.DriverRaceResults
+            .Where(dr => dr.RaceId == raceId)
             .IncludeForMapping()
-            .FirstOrDefaultAsync(r => r.RaceId == raceId);
+            .ToListAsync();
     }
 }

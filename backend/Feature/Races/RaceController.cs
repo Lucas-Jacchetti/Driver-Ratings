@@ -51,6 +51,14 @@ public class RaceController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = raceCreated.Id }, RaceMapper.ToResponse(raceCreated));
     }
 
+    [HttpGet("current")]
+    public async Task<IActionResult> GetCurrent()
+    {
+        var race = await _service.GetCurrentAsync();
+        if (race is null) return NotFound();
+        return Ok(RaceMapper.ToResponse(race));
+    }
+
     [Authorize] //admin
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)

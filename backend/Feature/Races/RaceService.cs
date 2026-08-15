@@ -47,6 +47,17 @@ public class RaceService : IRaceService
         return await GetByIdAsync(race.Id);
     }
 
+    public async Task<Race?> GetCurrentAsync()
+    {
+        var now = DateTime.UtcNow;
+
+        return await _dbContext.Races
+            .IncludeForMapping()
+            .Where(r => r.Date.AddHours(Race.DurationHours) <= now)
+            .OrderByDescending(r => r.Date)
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<Race?> DeleteAsync(Guid raceId)
     {
         var race = await _dbContext.Races.FindAsync(raceId);

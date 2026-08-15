@@ -39,14 +39,14 @@ public class DriverRaceResultController : ControllerBase
     [HttpGet("race/{raceId:guid}")]
     public async Task<IActionResult> GetByRaceId(Guid raceId)
     {
-        var driverRaceResult = await _service.GetByRaceIdAsync(raceId);
+        var results = await _service.GetByRaceIdAsync(raceId);
 
-        if (driverRaceResult is null)
+        if (results is null)
         {
             return NotFound();
         }
 
-        return Ok(DriverRaceResultMapper.ToResponse(driverRaceResult));
+        return Ok(results.Select(DriverRaceResultMapper.ToSummary).ToList());
     }
 
     [Authorize]

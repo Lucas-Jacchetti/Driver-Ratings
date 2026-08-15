@@ -11,5 +11,5 @@ public interface IDriverRaceResultService
     Task<DriverRaceResult?> GetByIdAsync(Guid id);
     Task<DriverRaceResult?> DeleteAsync(Guid driverRaceResultId);
     Task<Result<ICollection<DriverRaceResult>>> UpdateDriverRaceResultsAsync(Guid raceId, DriverRaceResultSubmissionRequest submission);    
-    Task<DriverRaceResult?> GetByRaceIdAsync(Guid raceId);
+    Task<ICollection<DriverRaceResult>> GetByRaceIdAsync(Guid raceId);
 }
