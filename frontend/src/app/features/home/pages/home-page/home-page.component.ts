@@ -18,10 +18,30 @@ const TEAM_COLORS: Record<string, string> = {
   'Aston Martin': '#229971',
   Alpine: '#2293D1',
   Williams: '#64C4FF',
-  RB: '#6692FF',
-  'Kick Sauber': '#52E252',
-  Haas: '#B6BABD',
+  "Racing Bulls": '#6692FF',
+  Audi: '#8B0000',
+  Haas: '#FFFFFF',
+  Cadillac: '#C0C0C0',
 };
+
+const TEAM_ORDER = [
+  'McLaren',
+  'Mercedes',
+  'Red Bull Racing',
+  'Ferrari',
+  'Racing Bulls',
+  'Williams',
+  'Aston Martin',
+  'Haas',
+  'Audi',
+  'Alpine',
+  'Cadillac',
+];
+
+function teamOrderIndex(teamName: string): number {
+  const index = TEAM_ORDER.indexOf(teamName);
+  return index === -1 ? TEAM_ORDER.length : index; 
+}
 
 @Component({
   selector: 'app-home-page',
@@ -102,11 +122,7 @@ const TEAM_COLORS: Record<string, string> = {
                         Contexto
                       </button>
 
-                      @if (contextOpen[result.id]) {
-                        <p class="mt-2 text-xs leading-relaxed text-gray-400">
-                          {{ result.context || 'Sem contexto adicional para este piloto.' }}
-                        </p>
-                      }
+                      
                     </div>
                   </div>
 
@@ -143,6 +159,11 @@ const TEAM_COLORS: Record<string, string> = {
                     </span>
                   </div>
                 </div>
+                @if (contextOpen[result.id]) {
+                  <p class="mt-2 text-xs leading-relaxed text-gray-400">
+                    {{ result.context || 'No additional context for this driver.' }}
+                  </p>
+                }
               </div>
             }
           </div>
@@ -198,6 +219,11 @@ export class HomePageComponent implements OnInit {
   ngOnInit(): void {
     this.racesService.getById('019ff221-4c49-732b-a88a-40a991b6b180').subscribe({
       next: (race) => {
+        race.driverRaceResults = [...race.driverRaceResults].sort(
+          (a, b) =>
+            teamOrderIndex(a.driverSeason.team.name) - teamOrderIndex(b.driverSeason.team.name) ||
+            a.driverSeason.driverNumber - b.driverSeason.driverNumber
+        );
         this.race.set(race);
         this.loading.set(false);
 
