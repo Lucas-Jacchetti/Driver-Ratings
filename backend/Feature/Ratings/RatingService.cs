@@ -126,6 +126,72 @@ public class RatingService : IRatingService
         }
     }
 
+    public async Task<Result<ICollection<Rating>>> UpdateRaceRatingsAsync(RaceRatingSubmission submission)
+    {
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        try
+        {
+            var driverRaceResultIds = submission.Ratings.Select(r => r.DriverRaceResultId)
+                .ToList();
+
+            var driverRaceResults = await _dbContext.DriverRaceResults.Where(drr => driverRaceResultIds.Contains(drr.Id))
+                .ToListAsync();
+
+            var race = await _dbContext.Races.FirstOrDefaultAsync(r => r.Id == submission.RaceId);
+            if (race is null)
+            {
+                return Result<ICollection<Rating>>.Failure("Race not found.");
+            }
+
+            var ratingsOpenAt = race.Date.AddHours(Race.DurationHours);
+            if (DateTime.UtcNow < ratingsOpenAt)
+            {
+                return Result<ICollection<Rating>>.Failure($"Ratings for this race open at {ratingsOpenAt:u}.");
+            }
+
+            if (driverRaceResults.Count != driverRaceResultIds.Count)
+            {
+                return Result<ICollection<Rating>>.Failure("One or more race results were not found.");
+            }
+
+            var validIds = await _dbContext.DriverRaceResults
+                .Where(drr => drr.RaceId == submission.RaceId)
+                .Select(drr => drr.Id)
+                .ToHashSetAsync();
+
+            foreach (var rating in submission.Ratings)
+            {
+                if (!validIds.Contains(rating.DriverRaceResultId))
+                {
+                    return Result<ICollection<Rating>>.Failure("Invalid driver race result.");
+                }
+            }
+
+            _dbContext.Ratings.UpdateRange(submission.Ratings);
+
+            await _dbContext.SaveChangesAsync();
+
+            var savedRatings = await _dbContext.Ratings
+                .Where(r => submission.Ratings
+                    .Select(sr => sr.Id)
+                    .Contains(r.Id))
+                .IncludeForMapping()
+                .ToListAsync();
+
+            await transaction.CommitAsync();
+
+            return Result<ICollection<Rating>>
+                .Success(savedRatings);
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+
+            return Result<ICollection<Rating>>
+                .Failure("An error occurred while saving the ratings.");
+        }
+    }
+
     public async Task<Rating?> DeleteAsync(Guid ratingId)
     {
         var rating = await _dbContext.Ratings.FindAsync(ratingId);
@@ -139,6 +205,8 @@ public class RatingService : IRatingService
 
         return rating;
     }
+
+    
 
     public async Task<ICollection<Rating>> GetAllAsync()
     {

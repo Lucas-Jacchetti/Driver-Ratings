@@ -95,6 +95,41 @@ public class RatingController : ControllerBase
         return Ok(response);
     }
 
+    [Authorize]
+    [HttpPut("race/update")]
+    public async Task<IActionResult> UpdateRaceRatings(RaceRatingCreationDTO request)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var ratings = request.Ratings
+            .Select(r => new Rating{
+                UserId = userId,
+                DriverRaceResultId = r.DriverRaceResultId,
+                Score = Score.Create(r.Score)
+            })
+            .ToList();
+
+        var submission = new RaceRatingSubmission
+        {
+            UserId = userId,
+            RaceId = request.RaceId,
+            Ratings = ratings
+        };
+
+        var result = await _service.UpdateRaceRatingsAsync(submission);
+
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        var response = result.Value!
+            .Select(RatingMapper.ToResponse)
+            .ToList();
+
+        return Ok(response);
+    }
+
     [HttpGet("season/{seasonId:guid}")]
     public async Task<IActionResult> GetSeasonRatings(Guid seasonId)
     {
