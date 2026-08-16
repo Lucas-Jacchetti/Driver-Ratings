@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://SEU_BACKEND_EM_PRODUCAO/api',
+  apiUrl: 'http://localhost:5030/api',
+  googleClientId: '827888631012-nvuuvds5fd2j2s20t8se1vo16rmqnp0n.apps.googleusercontent.com',
 };

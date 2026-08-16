@@ -8,7 +8,7 @@ import { DriverRaceResultSubmissionRequest } from '../models/driver-race-result.
 @Injectable({ providedIn: 'root' })
 export class RacesService {
   private http = inject(HttpClient);
-  private baseUrl = `${environment.apiUrl}/races`;
+  private baseUrl = `${environment.apiUrl}/race`;
 
   getAll(): Observable<RaceSummaryDTO[]> {
     return this.http.get<RaceSummaryDTO[]>(this.baseUrl);
@@ -23,6 +23,10 @@ export class RacesService {
   }
 
   submitResults(request: DriverRaceResultSubmissionRequest): Observable<void> {
-    return this.http.put<void>(`${environment.apiUrl}/driverraceresults/bulk`, request);
+    return this.http.put<void>(`${environment.apiUrl}/driverraceresult/bulk`, request);
   }
+
+  getCurrent(): Observable<RaceResponseDTO> {
+  return this.http.get<RaceResponseDTO>(`${this.baseUrl}/current`);
+}
 }

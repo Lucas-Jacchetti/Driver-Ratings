@@ -1,152 +1,297 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../../../shared/components/icon.component';
-import { MOCK_MY_JAPAN_DRAFT, MockDriverRow, scoreColorClass } from '../../../../shared/mock/f1-mock-data';
+import { AuthGateComponent } from '../../../../shared/components/auth-gate.component';
+import { AuthService } from '../../../auth/services/auth.service';
+import { RacesService } from '../../../races/services/races.service';
+import { RatingsService } from '../../../ratings/services/ratings.service';
+import { RaceResponseDTO } from '../../../races/models/race.model';
+import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner.component';
+
+
+const TEAM_COLORS: Record<string, string> = {
+  'Red Bull Racing': '#3671C6',
+  Ferrari: '#E8002D',
+  McLaren: '#FF8000',
+  Mercedes: '#27F4D2',
+  'Aston Martin': '#229971',
+  Alpine: '#2293D1',
+  Williams: '#64C4FF',
+  RB: '#6692FF',
+  'Kick Sauber': '#52E252',
+  Haas: '#B6BABD',
+};
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [CommonModule, FormsModule, IconComponent, AuthGateComponent, LoadingSpinnerComponent],
   template: `
-    <div class="mb-6 flex flex-col gap-4 rounded-lg border border-gray-800 bg-[#141414] p-5 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-red-500">Corrida Atual</p>
-        <h1 class="text-xl font-bold text-white">{{ currentRace.name }}</h1>
-        <p class="mt-1 text-sm text-gray-400">{{ currentRace.flag }} {{ currentRace.circuit }}</p>
-      </div>
-      <div class="flex gap-6">
-        <div>
-          <p class="text-xs uppercase tracking-wide text-gray-500">Data</p>
-          <p class="text-sm font-medium text-white">{{ currentRace.date }}</p>
-        </div>
-        <div>
-          <p class="text-xs uppercase tracking-wide text-gray-500">Voltas</p>
-          <p class="text-sm font-medium text-white">{{ currentRace.laps }}</p>
-        </div>
-        <div>
-          <p class="text-xs uppercase tracking-wide text-gray-500">Circuito</p>
-          <p class="text-sm font-medium text-white">{{ currentRace.length }}</p>
-        </div>
-      </div>
-    </div>
-
-    <h2 class="text-lg font-bold text-white">Avalie os Pilotos</h2>
-    <p class="mb-4 text-sm text-gray-500">Dê sua nota de 0 a 10 para o desempenho de cada piloto.</p>
-
-    <div class="space-y-3">
-      @for (row of drivers; track row.driverId; let i = $index) {
-        <div class="rounded-2xl border border-gray-800 bg-[#141414] px-6 py-7">
-          <div class="flex flex-wrap items-center gap-6">
-            <div class="flex min-w-[220px] items-center gap-3">
-              <span class="shrink-0 text-2xl leading-none">{{ row.flag }}</span>
-              <div>
-                <div class="text-xl font-black uppercase leading-tight text-white">{{ row.name }}</div>
-                <div class="mt-0.5 flex items-center gap-1.5">
-                  <span class="h-2.5 w-2.5 rounded-full opacity-80" [style.background]="row.teamColor"></span>
-                  <span class="text-xs text-white/50">{{ row.team }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex shrink-0 items-center gap-3">
-              <div class="text-center">
-                <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">Largada</div>
-                <div class="text-lg font-black text-gray-300">P{{ row.startPosition }}</div>
-              </div>
-              <svg width="18" height="10" viewBox="0 0 20 10" class="opacity-30" aria-hidden="true">
-                <path d="M0 5h14M11 1l5 4-5 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-              <div class="text-center">
-                <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">Chegada</div>
-                <div class="text-lg font-black text-white">P{{ row.finishPosition }}</div>
-              </div>
-            </div>
-
-            <div class="flex min-w-[220px] flex-1 items-center gap-4">
-              <input
-                type="range"
-                min="0"
-                max="10"
-                step="0.5"
-                class="h-1.5 w-full cursor-pointer appearance-none rounded-full accent-[#ff1f1f]"
-                [style.background]="trackBackground(row.score)"
-                [(ngModel)]="row.score"
-                [name]="'score-' + row.driverId"
-              />
-              <span class="w-12 shrink-0 text-right text-3xl font-black leading-none" [class]="scoreColorClass(row.score)">
-                {{ row.score.toFixed(1) }}
-              </span>
+    @if (loading()) {
+      <app-loading-spinner />
+    } @else {
+      @if (race(); as r) {
+        <div class="mb-6 flex flex-col gap-4 rounded-lg border border-gray-800 bg-[#141414] p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-red-500">Corrida Atual</p>
+            <h1 class="text-xl font-bold text-white">{{ r.name }}</h1>
+            <p class="mt-1 text-sm text-gray-400">{{ r.circuit }}</p>
+          </div>
+          <div class="flex gap-6">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-500">Data</p>
+              <p class="text-sm font-medium text-white">{{ r.date }}</p>
             </div>
           </div>
+        </div>
 
-          <div class="mt-4">
-            <button
-              type="button"
-              class="flex items-center gap-2 text-xs text-white/40"
-              (click)="contextOpen[i] = !contextOpen[i]"
-            >
-              <span class="inline-flex transition-transform" [class.rotate-90]="contextOpen[i]">
-                <app-icon name="chevron-right" [size]="12" />
-              </span>
-              Contexto
-            </button>
-
-            @if (contextOpen[i]) {
-              <p class="mt-2 text-xs leading-relaxed text-gray-400">
-                {{ contexts[i] || 'Sem contexto adicional para este piloto.' }}
+        <app-auth-gate message="Você precisa estar logado pra avaliar os pilotos.">
+          <div class="mb-4 flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-bold text-white">
+                {{ alreadyRated() ? 'Suas Avaliações' : 'Avalie os Pilotos' }}
+              </h2>
+              <p class="text-sm text-gray-500">
+                {{
+                  editing()
+                    ? 'Ajuste as notas e salve as alterações.'
+                    : alreadyRated()
+                      ? 'Essas foram as notas que você deu pra cada piloto nessa corrida.'
+                      : 'Dê sua nota de 0 a 10 para o desempenho de cada piloto.'
+                }}
               </p>
+            </div>
+
+            @if (alreadyRated() && !editing()) {
+              <button
+                type="button"
+                class="rounded-lg bg-gray-800 px-4 py-2 text-xs font-semibold text-gray-200 hover:bg-gray-700"
+                (click)="startEditing()"
+              >
+                Editar avaliações
+              </button>
             }
           </div>
-        </div>
-      }
-    </div>
 
-    <div class="mt-6 flex justify-end">
-      <button
-        type="button"
-        class="rounded-xl bg-[#e10600] px-6 py-3 text-sm font-semibold text-white"
-      >
-        Enviar avaliações
-      </button>
-    </div>
+          <div class="space-y-3">
+            @for (result of r.driverRaceResults; track result.id) {
+              <div class="rounded-2xl border border-gray-800 bg-[#141414] px-6 py-7">
+                <div class="flex flex-wrap items-start gap-6">
+                  <div class="flex w-56 shrink-0 items-start gap-3">
+                    <div>
+                      <div class="text-xl font-black leading-tight text-white">
+                        {{ result.driverSeason.driver.name }}
+                      </div>
+                      <div class="mt-0.5 flex items-center gap-1.5">
+                        <span
+                          class="h-2.5 w-2.5 shrink-0 rounded-full opacity-80"
+                          [style.background]="teamColor(result.driverSeason.team.name)"
+                        ></span>
+                        <span class="text-xs text-white/50">{{ result.driverSeason.team.name }}</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        class="mt-1.5 flex items-center gap-1 text-xs text-white/40 hover:text-white/70"
+                        (click)="toggleContext(result.id)"
+                      >
+                        <span class="inline-flex transition-transform" [class.rotate-90]="contextOpen[result.id]">
+                          <app-icon name="chevron-right" [size]="12" />
+                        </span>
+                        Contexto
+                      </button>
+
+                      @if (contextOpen[result.id]) {
+                        <p class="mt-2 text-xs leading-relaxed text-gray-400">
+                          {{ result.context || 'Sem contexto adicional para este piloto.' }}
+                        </p>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="flex shrink-0 items-center gap-3">
+                    <div class="text-center">
+                      <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">Started</div>
+                      <div class="text-lg font-black text-gray-300">P{{ result.startingPosition }}</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">Finished</div>
+                      <div class="text-lg font-black text-white">{{ finishLabel(result.finishingPosition) }}</div>
+                    </div>
+                  </div>
+
+                  <div class="flex min-w-[220px] flex-1 items-center gap-4">
+                    <input
+                      type="range"
+                      min="0"
+                      max="10"
+                      step="0.5"
+                      class="rating-slider flex-1"
+                      [class.cursor-not-allowed]="!isEditable()"
+                      [class.opacity-50]="!isEditable()"
+                      [style.background]="trackBackground(scores[result.id])"
+                      [disabled]="!isEditable()"
+                      [(ngModel)]="scores[result.id]"
+                      [name]="'score-' + result.id"
+                    />
+                    <span
+                      class="w-12 shrink-0 text-right text-3xl font-black leading-none"
+                      [class]="scoreColorClass(scores[result.id])"
+                    >
+                      {{ (scores[result.id] ?? 0).toFixed(1) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          @if (!alreadyRated()) {
+            <div class="mt-6 flex justify-end">
+              <button
+                type="button"
+                class="rounded-xl bg-[#e10600] px-6 py-3 text-sm font-semibold text-white"
+                (click)="submit()"
+              >
+                Enviar avaliações
+              </button>
+            </div>
+          } @else if (editing()) {
+            <div class="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                class="rounded-xl bg-gray-800 px-6 py-3 text-sm font-semibold text-gray-200 hover:bg-gray-700"
+                (click)="cancelEditing()"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                class="rounded-xl bg-[#e10600] px-6 py-3 text-sm font-semibold text-white"
+                (click)="update()"
+              >
+                Salvar alterações
+              </button>
+            </div>
+          }
+        </app-auth-gate>
+      }
+    }
   `,
 })
-export class HomePageComponent {
-  currentRace = {
-    name: 'Grande Prêmio do Japão',
-    circuit: 'Suzuka International Racing Course',
-    flag: '🇯🇵',
-    date: '07 Abr 2024',
-    laps: 53,
-    length: '5.807 km',
-  };
+export class HomePageComponent implements OnInit {
+  private racesService = inject(RacesService);
+  private ratingsService = inject(RatingsService);
 
-  drivers: MockDriverRow[] = MOCK_MY_JAPAN_DRAFT.map((d) => ({ ...d }));
-  contextOpen: boolean[] = this.drivers.map(() => false);
-  contexts: string[] = this.drivers.map((driver) => this.defaultContext(driver.driverId));
+  authService = inject(AuthService);
 
-  scoreColorClass = scoreColorClass;
+  race = signal<RaceResponseDTO | null>(null);
+  loading = signal(true);
+  alreadyRated = signal(false);
+  editing = signal(false);
+  scores: Record<string, number | undefined> = {};
+  contextOpen: Record<string, boolean> = {};
 
-  private defaultContext(driverId: string): string {
-    const map: Record<string, string> = {
-      verstappen: 'Controlou a corrida com confiança, mantendo ritmo superior e pressão constante sobre os rivais.',
-      perez: 'Manteve a posição com boa consistência e aproveitou a estratégia sem riscos desnecessários.',
-      sainz: 'Boa execução da corrida, saiu bem da curva e aproveitou o ritmo para recuperar posições.',
-      leclerc: 'Teve bons momentos, mas perdeu eficiência em momentos decisivos da estratégia.',
-      norris: 'Mostrou bom ritmo no meio da corrida, porém sem conseguir tirar proveito completo do potencial.',
-      piastri: 'Estreia sólida, com boa leitura de pneus e bastante consistência durante a prova.',
-      hamilton: 'Corrida abaixo do esperado, com dificuldades em ritmo e concorrência direta.',
-      russell: 'Manteve a regularidade, sem grandes erros e com boa gestão do desgaste.',
-      alonso: 'Fez o máximo com o carro, buscando otimizar cada setor e tratando bem o desgaste dos pneus.',
-      tsunoda: 'Desempenho sólido no ritmo, mas faltou agressividade nas fases mais importantes da prova.',
-    };
+  private originalScores: Record<string, number | undefined> = {};
 
-    return map[driverId] ?? 'Desempenho consistente, com boa leitura da corrida e gestão de pneus.';
+  ngOnInit(): void {
+    this.racesService.getById('019ff221-4c49-732b-a88a-40a991b6b180').subscribe({
+      next: (race) => {
+        this.race.set(race);
+        this.loading.set(false);
+
+        for (const result of race.driverRaceResults) {
+          this.scores[result.id] = 5;
+          this.contextOpen[result.id] = false;
+        }
+
+        if (this.authService.isAuthenticated()) {
+          this.ratingsService.getUserRaceRatings(race.id).subscribe((userRatings) => {
+            if (userRatings.length === 0) return;
+
+            this.alreadyRated.set(true);
+
+            for (const rating of userRatings) {
+              const result = race.driverRaceResults.find(
+                (r) => r.driverSeason.id === rating.driverSeasonId
+              );
+              if (result) {
+                this.scores[result.id] = rating.averageRating;
+              }
+            }
+
+            this.originalScores = { ...this.scores };
+          });
+        }
+      },
+      error: () => this.loading.set(false),
+    });
   }
 
-  trackBackground(score: number): string {
-    const pct = (score / 10) * 100;
-    return `linear-gradient(to right, #ff1f1f 0%, #ff1f1f ${pct}%, #252525 ${pct}%, #252525 100%)`;
+  isEditable(): boolean {
+    return !this.alreadyRated() || this.editing();
+  }
+
+  toggleContext(resultId: string): void {
+    this.contextOpen[resultId] = !this.contextOpen[resultId];
+  }
+
+  teamColor(teamName: string): string {
+    return TEAM_COLORS[teamName] ?? '#6b7280';
+  }
+
+  finishLabel(position: number): string {
+    return position === 0 ? 'DNF' : `P${position}`;
+  }
+
+  scoreColorClass(score: number | undefined): string {
+    const value = score ?? 0;
+    if (value >= 8) return 'text-emerald-400';
+    if (value >= 6) return 'text-yellow-400';
+    if (value >= 4) return 'text-orange-400';
+    return 'text-red-400';
+  }
+
+  trackBackground(score: number | undefined): string {
+    const pct = ((score ?? 0) / 10) * 100;
+    return `linear-gradient(to right, #ff1f1f 0%, #ff1f1f ${pct}%, #374151 ${pct}%, #374151 100%)`;
+  }
+
+  startEditing(): void {
+    this.editing.set(true);
+  }
+
+  cancelEditing(): void {
+    this.scores = { ...this.originalScores };
+    this.editing.set(false);
+  }
+
+  submit(): void {
+    const race = this.race();
+    if (!race) return;
+
+    const ratings = race.driverRaceResults
+      .filter((r) => this.scores[r.id] != null)
+      .map((r) => ({ driverRaceResultId: r.id, score: this.scores[r.id]! }));
+
+    this.ratingsService.submitRatings({ raceId: race.id, ratings }).subscribe(() => {
+      this.alreadyRated.set(true);
+      this.originalScores = { ...this.scores };
+    });
+  }
+
+  update(): void {
+    const race = this.race();
+    if (!race) return;
+
+    const ratings = race.driverRaceResults
+      .filter((r) => this.scores[r.id] != null)
+      .map((r) => ({ driverRaceResultId: r.id, score: this.scores[r.id]! }));
+
+    this.ratingsService.updateRatings({ raceId: race.id, ratings }).subscribe(() => {
+      this.originalScores = { ...this.scores };
+      this.editing.set(false);
+    });
   }
 }
