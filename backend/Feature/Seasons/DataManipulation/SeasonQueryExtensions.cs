@@ -8,6 +8,9 @@ public static class SeasonQueryExtensions
     public static IQueryable<Season> IncludeForMapping(
         this IQueryable<Season> query) =>
         query
-            .Include(ds => ds.Races)
-            .Include(ds => ds.DriverSeasons);
+            .Include(s => s.Races)
+            .Include(s => s.DriverSeasons)
+                .ThenInclude(ds => ds.Driver)
+            .Include(s => s.DriverSeasons)
+                .ThenInclude(ds => ds.Team);
 }
