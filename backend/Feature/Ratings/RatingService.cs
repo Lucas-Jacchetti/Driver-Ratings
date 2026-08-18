@@ -230,11 +230,67 @@ public class RatingService : IRatingService
             .FirstOrDefaultAsync(r => r.Id == id);
     }
 
-    public async Task<ICollection<DriverSeasonRating>> GetRaceRatingsAsync(Guid raceId)
+    // public async Task<ICollection<DriverSeasonRating>> GetRaceRatingsAsync(Guid raceId, int year)
+    // {
+    //     return await _dbContext.Ratings
+    //         .Where(r => r.DriverRaceResult.RaceId == raceId && r.DriverRaceResult.Race.Season.Year == year)
+    //         .GroupBy(r => new {r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name})
+    //         .OrderByDescending(g => g.Average(r => r.Score.Value))
+    //         .Select(g => new DriverSeasonRating(
+    //             g.Key.DriverSeasonId,
+    //             g.Key.DriverName,
+    //             Math.Round(g.Average(r => r.Score.Value), 2)
+    //         ))
+    //         .ToListAsync();
+    // }
+
+    // public async Task<ICollection<DriverSeasonRating>> GetSeasonRatingsAsync(Guid seasonId, int year)
+    // {
+    //     return await _dbContext.Ratings
+    //         .Where(r => r.DriverRaceResult.DriverSeason.SeasonId == seasonId && r.DriverRaceResult.DriverSeason.Season.Year == year)
+    //         .GroupBy(r => new {r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name})
+    //         .OrderByDescending(g => g.Average(r => r.Score.Value))
+    //         .Select(g => new DriverSeasonRating(
+    //             g.Key.DriverSeasonId,
+    //             g.Key.DriverName,
+    //             Math.Round(g.Average(r => r.Score.Value), 2)
+    //         ))
+    //         .ToListAsync();
+    // }
+
+    // public async Task<ICollection<DriverSeasonRating>> GetUserRaceRatingsAsync(Guid raceId, Guid userId, int year)
+    // {
+    //     return await _dbContext.Ratings
+    //         .Where(r => r.DriverRaceResult.RaceId == raceId && r.UserId == userId && r.DriverRaceResult.Race.Season.Year == year)
+    //         .GroupBy(r => new {r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name})
+    //         .OrderByDescending(g => g.Average(r => r.Score.Value))
+    //         .Select(g => new DriverSeasonRating(
+    //             g.Key.DriverSeasonId,
+    //             g.Key.DriverName,
+    //             Math.Round(g.Average(r => r.Score.Value), 2)
+    //         ))
+    //         .ToListAsync();
+    // }
+
+    // public async Task<ICollection<DriverSeasonRating>> GetUserRatingsAsync(Guid seasonId, Guid userId, int year)
+    // {
+    //     return await _dbContext.Ratings
+    //         .Where(r => r.DriverRaceResult.DriverSeason.SeasonId == seasonId && r.UserId == userId && r.DriverRaceResult.DriverSeason.Season.Year == year)
+    //         .GroupBy(r => new {r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name})
+    //         .OrderByDescending(g => g.Average(r => r.Score.Value))
+    //         .Select(g => new DriverSeasonRating(
+    //             g.Key.DriverSeasonId,
+    //             g.Key.DriverName,
+    //             Math.Round(g.Average(r => r.Score.Value), 2)
+    //         ))
+    //         .ToListAsync();
+    // }
+
+    public async Task<ICollection<DriverSeasonRating>> GetUserRatingsAsync(int year, Guid userId, Guid? raceId)
     {
         return await _dbContext.Ratings
-            .Where(r => r.DriverRaceResult.RaceId == raceId)
-            .GroupBy(r => new {r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name})
+            .Where(r =>r.UserId == userId && r.DriverRaceResult.Race.Season.Year == year && (raceId == null || r.DriverRaceResult.RaceId == raceId))
+            .GroupBy(r => new{r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name})
             .OrderByDescending(g => g.Average(r => r.Score.Value))
             .Select(g => new DriverSeasonRating(
                 g.Key.DriverSeasonId,
@@ -244,39 +300,11 @@ public class RatingService : IRatingService
             .ToListAsync();
     }
 
-    public async Task<ICollection<DriverSeasonRating>> GetSeasonRatingsAsync(Guid seasonId)
+    public async Task<ICollection<DriverSeasonRating>> GetGlobalRatingsAsync(int year, Guid? raceId)
     {
         return await _dbContext.Ratings
-            .Where(r => r.DriverRaceResult.DriverSeason.SeasonId == seasonId)
-            .GroupBy(r => new {r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name})
-            .OrderByDescending(g => g.Average(r => r.Score.Value))
-            .Select(g => new DriverSeasonRating(
-                g.Key.DriverSeasonId,
-                g.Key.DriverName,
-                Math.Round(g.Average(r => r.Score.Value), 2)
-            ))
-            .ToListAsync();
-    }
-
-    public async Task<ICollection<DriverSeasonRating>> GetUserRaceRatingsAsync(Guid raceId, Guid userId)
-    {
-        return await _dbContext.Ratings
-            .Where(r => r.DriverRaceResult.RaceId == raceId && r.UserId == userId)
-            .GroupBy(r => new {r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name})
-            .OrderByDescending(g => g.Average(r => r.Score.Value))
-            .Select(g => new DriverSeasonRating(
-                g.Key.DriverSeasonId,
-                g.Key.DriverName,
-                Math.Round(g.Average(r => r.Score.Value), 2)
-            ))
-            .ToListAsync();
-    }
-
-    public async Task<ICollection<DriverSeasonRating>> GetUserRatingsAsync(Guid seasonId, Guid userId)
-    {
-        return await _dbContext.Ratings
-            .Where(r => r.DriverRaceResult.DriverSeason.SeasonId == seasonId && r.UserId == userId)
-            .GroupBy(r => new {r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name})
+            .Where(r => r.DriverRaceResult.Race.Season.Year == year && (raceId == null || r.DriverRaceResult.RaceId == raceId))
+            .GroupBy(r => new{r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name})
             .OrderByDescending(g => g.Average(r => r.Score.Value))
             .Select(g => new DriverSeasonRating(
                 g.Key.DriverSeasonId,

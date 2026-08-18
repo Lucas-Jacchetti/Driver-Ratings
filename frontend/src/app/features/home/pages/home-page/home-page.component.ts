@@ -287,7 +287,7 @@ export class HomePageComponent implements OnInit {
         }
 
         if (this.authService.isAuthenticated()) {
-          this.ratingsService.getUserRaceRatings(race.id).subscribe((userRatings) => {
+          this.ratingsService.getUserRatings(race.season.year,race.id).subscribe((userRatings) => {
             if (userRatings.length === 0) return;
 
             this.alreadyRated.set(true);

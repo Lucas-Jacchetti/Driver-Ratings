@@ -1,8 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { DriverSeasonRating, RaceRatingCreationDTO } from '../models/rating.model';
+import {
+  DriverSeasonRating,
+  RaceRatingCreationDTO
+} from '../models/rating.model';
 
 @Injectable({ providedIn: 'root' })
 export class RatingsService {
@@ -17,7 +20,29 @@ export class RatingsService {
     return this.http.put<void>(`${this.baseUrl}/race/update`, request);
   }
 
-  getUserRaceRatings(raceId: string): Observable<DriverSeasonRating[]> {
-    return this.http.get<DriverSeasonRating[]>(`${this.baseUrl}/race/user/${raceId}`);
+  getGlobalRatings(year: number, raceId?: string): Observable<DriverSeasonRating[]> {
+    let params = new HttpParams().set('year', year);
+
+    if (raceId) {
+      params = params.set('raceId', raceId);
+    }
+
+    return this.http.get<DriverSeasonRating[]>(
+      `${this.baseUrl}/global`,
+      { params }
+    );
+  }
+
+  getUserRatings(year: number,raceId?: string): Observable<DriverSeasonRating[]> {
+    let params = new HttpParams().set('year', year);
+
+    if (raceId) {
+      params = params.set('raceId', raceId);
+    }
+
+    return this.http.get<DriverSeasonRating[]>(
+      `${this.baseUrl}/user`,
+      { params }
+    );
   }
 }
