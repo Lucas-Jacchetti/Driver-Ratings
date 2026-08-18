@@ -72,12 +72,11 @@ export class AppSidebarComponent {
   userInitial = 'L';
 
   navItems: NavItem[] = [
-    { label: 'Início', path: '/', icon: 'home', exact: true },
-    { label: 'Corridas', path: '/races', icon: 'history' },
-    { label: 'Temporada', path: '/seasons', icon: 'calendar' },
-    { label: 'Comunidade', path: '/communities', icon: 'users' },
-    { label: 'Perfil', path: '/profile', icon: 'user' },
-    { label: 'Configurações', path: '/settings', icon: 'settings' },
+    { label: 'Rate Drivers', path: '/', icon: 'home', exact: true },
+    { label: 'Rankings', path: '/races', icon: 'history' },
+    { label: 'Community', path: '/communities', icon: 'users' },
+    { label: 'Profile', path: '/profile', icon: 'user' },
+    { label: 'Settings', path: '/settings', icon: 'settings' },
   ];
 
   close(): void {

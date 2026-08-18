@@ -16,8 +16,8 @@ import { IconComponent } from '../../shared/components/icon.component';
           <app-icon name="menu" [size]="20" />
         </button>
         <div>
-          <p class="text-sm font-semibold text-white sm:text-base">Olá, {{ userName }}!</p>
-          <p class="text-xs text-gray-500 sm:text-sm">Acompanhe e avalie os pilotos da corrida atual.</p>
+          <p class="text-sm font-semibold text-white sm:text-base">Hello, {{ userName }}!</p>
+          <p class="text-xs text-gray-500 sm:text-sm">Keep up and rate the drivers for the current race.</p>
         </div>
       </div>
 
@@ -25,7 +25,6 @@ import { IconComponent } from '../../shared/components/icon.component';
   `,
 })
 export class AppTopbarComponent {
-  // Mock -- vem do usuário logado / temporada ativa quando integrar.
   userName = 'Lucas';
 
   @Output() menuClick = new EventEmitter<void>();

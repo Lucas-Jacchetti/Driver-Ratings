@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
 
-// Placeholder -- útil quando a área de admin crescer (cadastro de corrida,
-// resultado em lote, etc.) e precisar de navegação própria, separada da navbar pública.
 @Component({
   selector: 'app-sidebar',
   standalone: true,

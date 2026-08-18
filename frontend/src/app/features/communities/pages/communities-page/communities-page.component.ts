@@ -14,8 +14,7 @@ interface MockCommunity {
   gradient: string;
 }
 
-// Dado mockado só pra popular a tela -- quando integrar, isso vira uma
-// chamada a CommunitiesService.getAll().
+
 const MOCK_COMMUNITIES: MockCommunity[] = [
   {
     id: 'f1-brasil-oficial',
