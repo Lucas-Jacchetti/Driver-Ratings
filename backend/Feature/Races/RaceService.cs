@@ -58,6 +58,14 @@ public class RaceService : IRaceService
             .FirstOrDefaultAsync();
     }
 
+    public async Task<ICollection<Race>> GetAllByYearAsync(int year)
+    {
+        return await _dbContext.Races
+            .IncludeForMapping()
+            .Where(r => r.Season.Year == year)
+            .ToListAsync();
+    }
+
     public async Task<Race?> DeleteAsync(Guid raceId)
     {
         var race = await _dbContext.Races.FindAsync(raceId);

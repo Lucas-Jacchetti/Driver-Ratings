@@ -59,6 +59,13 @@ public class RaceController : ControllerBase
         return Ok(RaceMapper.ToResponse(race));
     }
 
+    [HttpGet("year/{year:int}")]
+    public async Task<IActionResult> GetAllByYear(int year)
+    {
+        var races = await _service.GetAllByYearAsync(year);
+        return Ok(races.Select(RaceMapper.ToResponse).ToList());
+    }
+
     [Authorize] //admin
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)

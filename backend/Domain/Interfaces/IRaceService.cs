@@ -8,4 +8,5 @@ public interface IRaceService
     Task<Race?> GetByIdAsync(Guid id);
     Task<Race?> DeleteAsync(Guid raceId);
     Task<Race?> GetCurrentAsync();
+    Task<ICollection<Race>> GetAllByYearAsync(int year);
 }

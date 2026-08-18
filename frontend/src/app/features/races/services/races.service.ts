@@ -27,6 +27,10 @@ export class RacesService {
   }
 
   getCurrent(): Observable<RaceResponseDTO> {
-  return this.http.get<RaceResponseDTO>(`${this.baseUrl}/current`);
-}
+    return this.http.get<RaceResponseDTO>(`${this.baseUrl}/current`);
+  }
+
+  getAllByYear(year: number): Observable<RaceSummaryDTO[]> {
+    return this.http.get<RaceSummaryDTO[]>(`${this.baseUrl}/year/${year}`);
+  }
 }

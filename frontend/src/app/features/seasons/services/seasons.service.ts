@@ -8,7 +8,7 @@ import { DriverSeasonCreationDTO, DriverSeasonSummaryDTO } from '../models/drive
 @Injectable({ providedIn: 'root' })
 export class SeasonsService {
   private http = inject(HttpClient);
-  private baseUrl = `${environment.apiUrl}/seasons`;
+  private baseUrl = `${environment.apiUrl}/season`;
 
   getAll(): Observable<SeasonResponseDTO[]> {
     return this.http.get<SeasonResponseDTO[]>(this.baseUrl);
