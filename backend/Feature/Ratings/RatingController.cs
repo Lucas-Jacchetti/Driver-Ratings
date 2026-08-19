@@ -130,22 +130,6 @@ public class RatingController : ControllerBase
         return Ok(response);
     }
 
-    // [HttpGet("season/{seasonId:guid}")]
-    // public async Task<IActionResult> GetSeasonRatings(Guid seasonId, [FromQuery] int year)
-    // {
-    //     var ratings = await _service.GetSeasonRatingsAsync(seasonId, year);
-
-    //     return Ok(ratings);
-    // }
-
-    // [HttpGet("race/{raceId:guid}")]
-    // public async Task<IActionResult> GetRaceRatings(Guid raceId, [FromQuery] int year)
-    // {
-    //     var ratings = await _service.GetRaceRatingsAsync(raceId, year);
-
-    //     return Ok(ratings);
-    // }
-
     [HttpGet("global")]
     public async Task<IActionResult> GetGlobalRatings([FromQuery] int year, [FromQuery] Guid? raceId)
     {
@@ -163,26 +147,6 @@ public class RatingController : ControllerBase
 
         return Ok(ratings);
     }
-
-    // [Authorize]
-    // [HttpGet("season/user/{seasonId:guid}")]
-    // public async Task<IActionResult> GetUserRatings(Guid seasonId, [FromQuery] int year)
-    // {
-    //     var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-    //     var ratings = await _service.GetUserRatingsAsync(seasonId, userId, year);
-
-    //     return Ok(ratings);
-    // }
-
-    // [Authorize]
-    // [HttpGet("race/user/{raceId:guid}")]
-    // public async Task<IActionResult> GetUserRaceRatings(Guid raceId, [FromQuery] int year)
-    // {
-    //     var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-    //     var ratings = await _service.GetUserRaceRatingsAsync(raceId, userId, year);
-
-    //     return Ok(ratings);
-    // }
 
     [Authorize] //admin
     [HttpDelete("{id:guid}")]

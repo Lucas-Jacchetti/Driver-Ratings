@@ -19,7 +19,7 @@ public static class DriverSeasonMapper
         );
 
     public static DriverSeasonSummaryDTO ToSummary(DriverSeason driverSeason) =>
-        new(
+        new(    
             driverSeason.Id,
             driverSeason.DriverNumber,
             DriverMapper.ToSummary(driverSeason.Driver),
