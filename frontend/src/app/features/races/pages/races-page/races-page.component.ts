@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
@@ -28,6 +28,16 @@ const TEAM_COLORS: Record<string, string> = {
   Cadillac: '#C0C0C0',
 };
 
+interface DisplayResult {
+  id: string;
+  driverName: string;
+  teamName: string;
+  score: number;
+  context?: string;
+  startingPosition?: number;
+  finishingPosition?: number;
+}
+
 @Component({
   selector: 'app-races-page',
   standalone: true,
@@ -41,10 +51,11 @@ const TEAM_COLORS: Record<string, string> = {
         class="rounded-md border border-gray-800 bg-[#141414] px-3 py-2 text-sm text-gray-200 focus:border-red-600 focus:outline-none"
         [(ngModel)]="selectedYear"
         name="year"
+        (ngModelChange)="onYearChange()"
       >
-      @for (year of years(); track year.id) {
-        <option [value]="year.year">{{ year.year }}</option>
-      }
+        @for (year of years(); track year.id) {
+          <option [value]="year.year">{{ year.year }}</option>
+        }
       </select>
 
       <select
@@ -53,7 +64,7 @@ const TEAM_COLORS: Record<string, string> = {
         name="race"
         (ngModelChange)="onRaceChange()"
       >
-        <option [value]="">All Races</option>
+        <option [value]="''">All Races</option>
         @for (raceOption of races(); track raceOption.id) {
           <option [value]="raceOption.id">{{ raceOption.name }}</option>
         }
@@ -77,7 +88,7 @@ const TEAM_COLORS: Record<string, string> = {
     @if (loading()) {
       <app-loading-spinner />
     } @else {
-      @if (selectedRace(); as r) {
+      @if (raceView(); as r) {
         <div class="mb-6 flex flex-col gap-4 rounded-lg border border-gray-800 bg-[#141414] p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-red-500">{{ r.season.year }}</p>
@@ -92,167 +103,103 @@ const TEAM_COLORS: Record<string, string> = {
             </div>
           </div>
         </div>
+      } @else if (isSeasonView()) {
+        <div class="mb-6 rounded-lg border border-gray-800 bg-[#141414] p-5">
+          <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-red-500">{{ selectedYear }}</p>
+          <h1 class="text-xl font-bold text-white">Season Standings</h1>
+          <p class="mt-1 text-sm text-gray-400">Ranking of the drivers for the season</p>
+        </div>
+      }
 
-        @if (onlyMine) {
-          <app-auth-gate message="Sign up to see your ratings.">
-            @if (r.driverRaceResults.length) {
-              <div class="space-y-3">
-                @for (result of r.driverRaceResults; track result.id) {
-                  <div class="rounded-2xl border border-gray-800 bg-[#141414] px-6 py-7">
-                    <div class="flex flex-wrap items-start gap-6">
-                      <div class="flex w-56 shrink-0 items-start gap-3">
-                        <div>
-                          <div class="text-xl font-black leading-tight text-white">
-                            {{ result.driverSeason.driver.name }}
-                          </div>
+      @if (onlyMine) {
+        <app-auth-gate message="Sign up to see your ratings.">
+          <ng-container [ngTemplateOutlet]="resultsList" />
+        </app-auth-gate>
+      } @else {
+        <ng-container [ngTemplateOutlet]="resultsList" />
+      }
 
-                          <div class="mt-0.5 flex items-center gap-1.5">
-                            <span
-                              class="h-2.5 w-2.5 shrink-0 rounded-full opacity-80"
-                              [style.background]="teamColor(result.driverSeason.team.name)"
-                            ></span>
-
-                            <span class="text-xs text-white/50">
-                              {{ result.driverSeason.team.name }}
-                            </span>
-                          </div>
-
-                          @if (result.context != '') {
-                            <button
-                              type="button"
-                              class="mt-1.5 flex items-center gap-1 text-xs text-white/40 hover:text-white/70"
-                              (click)="toggleContext(result.id)"
-                            >
-                              <span class="inline-flex transition-transform" [class.rotate-90]="contextOpen[result.id]">
-                                <app-icon name="chevron-right" [size]="12" />
-                              </span>
-
-                              Context
-                            </button>
-                          }
-                        </div>
+      <ng-template #resultsList>
+        @if (displayResults().length) {
+          <div class="space-y-3">
+            @for (item of displayResults(); track item.id) {
+              <div class="rounded-2xl border border-gray-800 bg-[#141414] px-6 py-7">
+                <div class="flex flex-wrap items-start gap-6">
+                  <div class="flex w-56 shrink-0 items-start gap-3">
+                    <div>
+                      <div class="text-xl font-black leading-tight text-white">
+                        {{ item.driverName }}
                       </div>
 
-                      <div class="flex shrink-0 items-center gap-3">
-                        <div class="text-center">
-                          <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">Started</div>
-                          <div class="text-lg font-black text-gray-300">P{{ result.startingPosition }}</div>
-                        </div>
-
-                        <div class="text-center">
-                          <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">Finished</div>
-                          <div class="text-lg font-black text-white">{{ finishLabel(result.finishingPosition) }}</div>
-                        </div>
-                      </div>
-
-                      <div class="flex min-w-[220px] flex-1 items-center gap-4">
-                        <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-[#252525]">
-                          <div
-                            class="h-full rounded-full bg-[#ff1f1f]"
-                            [style.width.%]="driverScore(result.driverSeason.id) * 10"
-                          ></div>
-                        </div>
+                      <div class="mt-0.5 flex items-center gap-1.5">
                         <span
-                          class="w-12 shrink-0 text-right text-3xl font-black leading-none"
-                          [class]="scoreColorClass(driverScore(result.driverSeason.id))"
-                        >
-                          {{ driverScore(result.driverSeason.id).toFixed(1) }}
+                          class="h-2.5 w-2.5 shrink-0 rounded-full opacity-80"
+                          [style.background]="teamColor(item.teamName)"
+                        ></span>
+
+                        <span class="text-xs text-white/50">
+                          {{ item.teamName }}
                         </span>
                       </div>
-                    </div>
 
-                    @if (contextOpen[result.id]) {
-                      <p class="mt-2 text-xs leading-relaxed text-gray-400">
-                        {{ result.context }}
-                      </p>
-                    }
-                  </div>
-                }
-              </div>
-            } @else {
-              <p class="py-8 text-center text-sm text-gray-500">No ratings available for this race yet.</p>
-            }
-          </app-auth-gate>
-        } @else {
-          @if (r.driverRaceResults.length) {
-            <div class="space-y-3">
-              @for (result of r.driverRaceResults; track result.id) {
-                <div class="rounded-2xl border border-gray-800 bg-[#141414] px-6 py-7">
-                  <div class="flex flex-wrap items-start gap-6">
-                    <div class="flex w-56 shrink-0 items-start gap-3">
-                      <div>
-                        <div class="text-xl font-black leading-tight text-white">
-                          {{ result.driverSeason.driver.name }}
-                        </div>
-
-                        <div class="mt-0.5 flex items-center gap-1.5">
-                          <span
-                            class="h-2.5 w-2.5 shrink-0 rounded-full opacity-80"
-                            [style.background]="teamColor(result.driverSeason.team.name)"
-                          ></span>
-
-                          <span class="text-xs text-white/50">
-                            {{ result.driverSeason.team.name }}
+                      @if (item.context) {
+                        <button
+                          type="button"
+                          class="mt-1.5 flex items-center gap-1 text-xs text-white/40 hover:text-white/70"
+                          (click)="toggleContext(item.id)"
+                        >
+                          <span class="inline-flex transition-transform" [class.rotate-90]="contextOpen[item.id]">
+                            <app-icon name="chevron-right" [size]="12" />
                           </span>
-                        </div>
 
-                        @if (result.context != '') {
-                          <button
-                            type="button"
-                            class="mt-1.5 flex items-center gap-1 text-xs text-white/40 hover:text-white/70"
-                            (click)="toggleContext(result.id)"
-                          >
-                            <span class="inline-flex transition-transform" [class.rotate-90]="contextOpen[result.id]">
-                              <app-icon name="chevron-right" [size]="12" />
-                            </span>
-
-                            Context
-                          </button>
-                        }
-                      </div>
+                          Context
+                        </button>
+                      }
                     </div>
+                  </div>
 
+                  @if (item.startingPosition !== undefined) {
                     <div class="flex shrink-0 items-center gap-3">
                       <div class="text-center">
                         <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">Started</div>
-                        <div class="text-lg font-black text-gray-300">P{{ result.startingPosition }}</div>
+                        <div class="text-lg font-black text-gray-300">P{{ item.startingPosition }}</div>
                       </div>
 
                       <div class="text-center">
                         <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">Finished</div>
-                        <div class="text-lg font-black text-white">{{ finishLabel(result.finishingPosition) }}</div>
+                        <div class="text-lg font-black text-white">{{ finishLabel(item.finishingPosition!) }}</div>
                       </div>
                     </div>
-
-                    <div class="flex min-w-[220px] flex-1 items-center gap-4">
-                      <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-[#252525]">
-                        <div
-                          class="h-full rounded-full bg-[#ff1f1f]"
-                          [style.width.%]="driverScore(result.driverSeason.id) * 10"
-                        ></div>
-                      </div>
-                      <span
-                        class="w-12 shrink-0 text-right text-3xl font-black leading-none"
-                        [class]="scoreColorClass(driverScore(result.driverSeason.id))"
-                      >
-                        {{ driverScore(result.driverSeason.id).toFixed(1) }}
-                      </span>
-                    </div>
-                  </div>
-
-                  @if (contextOpen[result.id]) {
-                    <p class="mt-2 text-xs leading-relaxed text-gray-400">
-                      {{ result.context }}
-                    </p>
                   }
+
+                  <div class="flex min-w-[220px] flex-1 items-center gap-4">
+                    <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-[#252525]">
+                      <div
+                        class="h-full rounded-full bg-[#ff1f1f]"
+                        [style.width.%]="item.score * 10"
+                      ></div>
+                    </div>
+                    <span
+                      class="w-12 shrink-0 text-right text-3xl font-black leading-none"
+                      [class]="scoreColorClass(item.score)"
+                    >
+                      {{ item.score.toFixed(1) }}
+                    </span>
+                  </div>
                 </div>
-              }
-            </div>
-          } @else {
-            <p class="py-8 text-center text-sm text-gray-500">No ratings available for this race yet.</p>
-          }
+
+                @if (item.context && contextOpen[item.id]) {
+                  <p class="mt-2 text-xs leading-relaxed text-gray-400">
+                    {{ item.context }}
+                  </p>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="py-8 text-center text-sm text-gray-500">No ratings available yet.</p>
         }
-      }
+      </ng-template>
     }
   `,
 })
@@ -265,7 +212,9 @@ export class RacesPageComponent implements OnInit {
   loading = signal(true);
   races = signal<RaceSummaryDTO[]>([]);
   years = signal<SeasonSummaryDTO[]>([]);
-  selectedRace = signal<RaceResponseDTO | null>(null);
+
+  raceView = signal<RaceResponseDTO | null>(null);
+  standings = signal<DriverSeasonRating[]>([]);
 
   selectedYear: string | '2026' = '2026';
   selectedRaceId: string | null = null;
@@ -273,8 +222,37 @@ export class RacesPageComponent implements OnInit {
 
   contextOpen: Record<string, boolean> = {};
 
-  private ratingsByDriverSeason: Record<string, number> = {};
-  ratings: DriverSeasonRating[] = [];
+  isSeasonView = computed(() => this.raceView() === null);   
+
+  displayResults = computed<DisplayResult[]>(() => {
+    if (this.isSeasonView()) {
+      return this.standings().map((rating) => ({
+        id: rating.driverSeasonId,
+        driverName: rating.driverName,
+        teamName: rating.teamName,
+        score: rating.averageRating,
+      }));
+    }
+
+    const race = this.raceView();
+    if (!race) return [];
+
+    const ratingsByDriverSeason = Object.fromEntries(
+      this.ratings.map((rating) => [rating.driverSeasonId, rating.averageRating])
+    );
+
+    return race.driverRaceResults.map((result) => ({
+      id: result.id,
+      driverName: result.driverSeason.driver.name,
+      teamName: result.driverSeason.team.name,
+      score: ratingsByDriverSeason[result.driverSeason.id] ?? 0,
+      context: result.context,
+      startingPosition: result.startingPosition,
+      finishingPosition: result.finishingPosition,
+    }));
+  });
+
+  private ratings: DriverSeasonRating[] = [];
 
   ngOnInit(): void {
     this.loading.set(true);
@@ -288,60 +266,28 @@ export class RacesPageComponent implements OnInit {
         this.races.set(races);
         this.years.set(years);
 
-        const raceId = currentRace?.id ?? races[0]?.id;
-
-        if (!raceId) {
-          this.loading.set(false);
+        if (currentRace) {
+          this.selectedYear = currentRace.season.year.toString();
+          this.selectedRaceId = currentRace.id;
+          this.loadRace(currentRace.id);
           return;
         }
 
-        if (currentRace) {
-          this.selectedYear = currentRace.season.year.toString();
-        }
-
-        this.loadRaceAndRatings(raceId);
+        this.selectedRaceId = null;
+        this.loadSeasonStandings();
       },
       error: () => this.loading.set(false),
     });
   }
 
-  private loadRaceAndRatings(raceId: string): void {
+  onYearChange(): void {
     this.loading.set(true);
+    this.selectedRaceId = null;
 
-    const race$ = this.racesService.getById(raceId);
-
-    const ratings$ =
-      this.onlyMine && !this.authService.isAuthenticated()
-        ? of([] as DriverSeasonRating[])
-        : this.onlyMine
-          ? this.ratingsService.getUserRatings(+this.selectedYear, raceId)
-          : this.ratingsService.getGlobalRatings(+this.selectedYear, raceId);
-
-    forkJoin({ race: race$, ratings: ratings$ }).subscribe({
-      next: ({ race, ratings }) => {
-        this.selectedRaceId = race.id;
-        this.ratings = ratings;
-
-        this.ratingsByDriverSeason = Object.fromEntries(
-          ratings.map((rating) => [rating.driverSeasonId, rating.averageRating])
-        );
-
-        const ratingOrder = new Map(
-          ratings.map((rating, index) => [rating.driverSeasonId, index])
-        );
-
-        const sortedResults = [...race.driverRaceResults].sort(
-          (a, b) =>
-            (ratingOrder.get(a.driverSeason.id) ?? Infinity) -
-            (ratingOrder.get(b.driverSeason.id) ?? Infinity)
-        );
-
-        this.selectedRace.set({
-          ...race,
-          driverRaceResults: sortedResults
-        });
-
-        this.loading.set(false);
+    this.racesService.getAllByYear(+this.selectedYear).subscribe({
+      next: (races) => {
+        this.races.set(races);
+        this.loadSeasonStandings();
       },
       error: () => this.loading.set(false),
     });
@@ -349,7 +295,9 @@ export class RacesPageComponent implements OnInit {
 
   onRaceChange(): void {
     if (this.selectedRaceId) {
-      this.loadRaceAndRatings(this.selectedRaceId);
+      this.loadRace(this.selectedRaceId);
+    } else {
+      this.loadSeasonStandings();
     }
   }
 
@@ -357,8 +305,63 @@ export class RacesPageComponent implements OnInit {
     this.onlyMine = !this.onlyMine;
 
     if (this.selectedRaceId) {
-      this.loadRaceAndRatings(this.selectedRaceId);
+      this.loadRace(this.selectedRaceId);
+    } else {
+      this.loadSeasonStandings();
     }
+  }
+
+  private loadRace(raceId: string): void {
+    this.loading.set(true);
+    const year = +this.selectedYear;
+
+    const race$ = this.racesService.getById(raceId);
+    const ratings$ =
+      this.onlyMine && !this.authService.isAuthenticated()
+        ? of([] as DriverSeasonRating[])
+        : this.onlyMine
+          ? this.ratingsService.getUserRatings(year, raceId)
+          : this.ratingsService.getGlobalRatings(year, raceId);
+
+    forkJoin({ race: race$, ratings: ratings$ }).subscribe({
+      next: ({ race, ratings }) => {
+        this.selectedRaceId = race.id;
+        this.ratings = ratings;
+
+        const ratingOrder = new Map(ratings.map((rating, index) => [rating.driverSeasonId, index]));
+
+        const sortedResults = [...race.driverRaceResults].sort(
+          (a, b) =>
+            (ratingOrder.get(a.driverSeason.id) ?? Infinity) -
+            (ratingOrder.get(b.driverSeason.id) ?? Infinity)
+        );
+
+        this.raceView.set({ ...race, driverRaceResults: sortedResults });
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
+    });
+  }
+
+  private loadSeasonStandings(): void {
+    this.loading.set(true);
+    this.raceView.set(null);
+    const year = +this.selectedYear;
+
+    const ratings$ =
+      this.onlyMine && !this.authService.isAuthenticated()
+        ? of([] as DriverSeasonRating[])
+        : this.onlyMine
+          ? this.ratingsService.getUserRatings(year)
+          : this.ratingsService.getGlobalRatings(year);
+
+    ratings$.subscribe({
+      next: (ratings) => {
+        this.standings.set([...ratings].sort((a, b) => b.averageRating - a.averageRating));
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
+    });
   }
 
   toggleContext(resultId: string): void {
@@ -371,10 +374,6 @@ export class RacesPageComponent implements OnInit {
 
   finishLabel(position: number): string {
     return position === 0 ? 'DNF' : `P${position}`;
-  }
-
-  driverScore(driverSeasonId: string): number {
-    return this.ratingsByDriverSeason[driverSeasonId] ?? 0;
   }
 
   scoreColorClass(score: number): string {

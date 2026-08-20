@@ -20,5 +20,6 @@ export interface RaceRatingCreationDTO {
 export interface DriverSeasonRating {
   driverSeasonId: string;
   driverName: string;
+  teamName: string;
   averageRating: number;
 }
