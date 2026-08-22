@@ -31,6 +31,7 @@ const TEAM_COLORS: Record<string, string> = {
 interface DisplayResult {
   id: string;
   driverName: string;
+  driverCountryCode: string;
   teamName: string;
   score: number;
   context?: string;
@@ -92,7 +93,19 @@ interface DisplayResult {
         <div class="mb-6 flex flex-col gap-4 rounded-lg border border-gray-800 bg-[#141414] p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-red-500">{{ r.season.year }}</p>
-            <h1 class="text-xl font-bold text-white">{{ r.name }}</h1>
+            <div class="flex flex-row items-center gap-2">
+              <h1 class="text-xl font-bold text-white">{{ r.name }}</h1>
+              @if (r.flag) {
+                <div class="flex h-6 w-8 shrink-0 items-center justify-center sm:h-5 sm:w-8 md:h-7 md:w-9">
+                  <img
+                    [src]="flagUrl(r.flag)"
+                    alt=""
+                    class="h-full w-full object-contain"
+                    onerror="this.style.display='none'"
+                  />
+                </div>
+              }
+            </div>
             <p class="mt-1 text-sm text-gray-400">{{ r.circuit }}</p>
           </div>
 
@@ -127,10 +140,19 @@ interface DisplayResult {
                 <div class="flex flex-wrap items-start gap-6">
                   <div class="flex w-56 shrink-0 items-start gap-3">
                     <div>
-                      <div class="text-xl font-black leading-tight text-white">
-                        {{ item.driverName }}
+                      <div class="flex flex-row items-center gap-2 text-xl font-black leading-tight text-white">
+                        <p>{{ item.driverName }}</p>
+                        @if (item.driverCountryCode) {
+                          <div class="flex h-5 w-7 shrink-0 items-center justify-center sm:h-5 sm:w-8 md:h-6 md:w-9">
+                            <img
+                              [src]="flagUrl(item.driverCountryCode)"
+                              alt=""
+                              class="h-full w-full object-cover rounded-sm"
+                              onerror="this.style.display='none'"
+                            />
+                          </div>
+                        }
                       </div>
-
                       <div class="mt-0.5 flex items-center gap-1.5">
                         <span
                           class="h-2.5 w-2.5 shrink-0 rounded-full opacity-80"
@@ -229,6 +251,7 @@ export class RacesPageComponent implements OnInit {
       return this.standings().map((rating) => ({
         id: rating.driverSeasonId,
         driverName: rating.driverName,
+        driverCountryCode: rating.driverFlag,
         teamName: rating.teamName,
         score: rating.averageRating,
       }));
@@ -241,15 +264,21 @@ export class RacesPageComponent implements OnInit {
       this.ratings.map((rating) => [rating.driverSeasonId, rating.averageRating])
     );
 
-    return race.driverRaceResults.map((result) => ({
-      id: result.id,
-      driverName: result.driverSeason.driver.name,
-      teamName: result.driverSeason.team.name,
-      score: ratingsByDriverSeason[result.driverSeason.id] ?? 0,
-      context: result.context,
-      startingPosition: result.startingPosition,
-      finishingPosition: result.finishingPosition,
-    }));
+    return race.driverRaceResults
+      .filter(
+        (result) =>
+          !(result.startingPosition === 0 && result.finishingPosition === 0 && !result.context)
+      )
+      .map((result) => ({
+        id: result.id,
+        driverName: result.driverSeason.driver.name,
+        driverCountryCode: result.driverSeason.driver.flag,
+        teamName: result.driverSeason.team.name,
+        score: ratingsByDriverSeason[result.driverSeason.id] ?? 0,
+        context: result.context,
+        startingPosition: result.startingPosition,
+        finishingPosition: result.finishingPosition,
+      }));
   });
 
   private ratings: DriverSeasonRating[] = [];
@@ -362,6 +391,10 @@ export class RacesPageComponent implements OnInit {
       },
       error: () => this.loading.set(false),
     });
+  }
+
+  flagUrl(countryCode: string): string {
+    return `https://flagcdn.com/${countryCode.toLowerCase()}.svg`;
   }
 
   toggleContext(resultId: string): void {

@@ -5,13 +5,15 @@ export interface RaceSummaryDTO {
   id: string;
   name: string;
   circuit: string;
-  date: string; // ISO 8601 UTC -- converter pro fuso local só na exibição
+  flag: string;
+  date: string;
 }
 
 export interface RaceResponseDTO {
   id: string;
   name: string;
   circuit: string;
+  flag: string;
   date: string;
   season: SeasonSummaryDTO;
   driverRaceResults: DriverRaceResultSummaryDTO[];
@@ -20,6 +22,7 @@ export interface RaceResponseDTO {
 export interface RaceCreationDTO {
   name: string;
   circuit: string;
+  flag: string;
   date: string;
   seasonId: string;
 }
