@@ -5,5 +5,6 @@ namespace backend.Feature.Drivers.DataManipulation;
 public record DriverResponseDTO(
     Guid Id,
     string Name,
+    string Flag,
     ICollection<DriverSeasonSummaryDTO> DriverSeasons
 );

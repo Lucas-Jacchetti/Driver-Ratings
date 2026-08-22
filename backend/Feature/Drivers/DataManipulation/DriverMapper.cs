@@ -8,13 +8,14 @@ public static class DriverMapper
     public static DriverResponseDTO ToResponse(Driver driver) =>
         new(
             driver.Id,
+            driver.Flag,
             driver.Name,
             driver.DriverSeasons.Select(DriverSeasonMapper.ToSummary).ToList()
         );
 
     public static DriverSummaryDTO ToSummary(Driver driver) =>
-        new(driver.Id, driver.Name);
+        new(driver.Id, driver.Name, driver.Flag);
 
     public static Driver ToDomain(DriverCreationDTO driverCreationDTO) =>
-        new() { Name = driverCreationDTO.Name };
+        new() {Flag = driverCreationDTO.Flag, Name = driverCreationDTO.Name };
 }       

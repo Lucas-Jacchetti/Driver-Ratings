@@ -234,12 +234,13 @@ public class RatingService : IRatingService
     {
         return await _dbContext.Ratings
             .Where(r =>r.UserId == userId && r.DriverRaceResult.Race.Season.Year == year && (raceId == null || r.DriverRaceResult.RaceId == raceId))
-            .GroupBy(r => new{r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name, TeamName = r.DriverRaceResult.DriverSeason.Team.Name})
+            .GroupBy(r => new{r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name, TeamName = r.DriverRaceResult.DriverSeason.Team.Name, DriverFlag = r.DriverRaceResult.DriverSeason.Driver.Flag})
             .OrderByDescending(g => g.Average(r => r.Score.Value))
             .Select(g => new DriverSeasonRating(
                 g.Key.DriverSeasonId,
                 g.Key.DriverName,
                 g.Key.TeamName,
+                g.Key.DriverFlag,
                 Math.Round(g.Average(r => r.Score.Value), 2)
             ))
             .ToListAsync();
@@ -249,12 +250,13 @@ public class RatingService : IRatingService
     {
         return await _dbContext.Ratings
             .Where(r => r.DriverRaceResult.Race.Season.Year == year && (raceId == null || r.DriverRaceResult.RaceId == raceId))
-            .GroupBy(r => new{r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name, TeamName = r.DriverRaceResult.DriverSeason.Team.Name})
+            .GroupBy(r => new{r.DriverRaceResult.DriverSeasonId, DriverName = r.DriverRaceResult.DriverSeason.Driver.Name, TeamName = r.DriverRaceResult.DriverSeason.Team.Name, DriverFlag = r.DriverRaceResult.DriverSeason.Driver.Flag})
             .OrderByDescending(g => g.Average(r => r.Score.Value))
             .Select(g => new DriverSeasonRating(
                 g.Key.DriverSeasonId,
                 g.Key.DriverName,
                 g.Key.TeamName,
+                g.Key.DriverFlag,
                 Math.Round(g.Average(r => r.Score.Value), 2)
             ))
             .ToListAsync();

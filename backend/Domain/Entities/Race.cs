@@ -6,6 +6,7 @@ public class Race
     public Guid Id { get; set; }
     public required string Name { get; set; }
     public required string Circuit { get; set; }
+    public required string Flag { get; set; }
     public DateTime Date { get; set; }
 
     public Guid SeasonId { get; set; }
