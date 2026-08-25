@@ -39,6 +39,9 @@ public class DriverService : IDriverService
     {
         return await _dbContext.Drivers
             .Include(d => d.DriverSeasons)
+                .ThenInclude(ds => ds.Team)
+            .Include(d => d.DriverSeasons)
+                .ThenInclude(ds => ds.Season)
             .ToListAsync();
     }
 
@@ -46,6 +49,9 @@ public class DriverService : IDriverService
     {
         return await _dbContext.Drivers
             .Include(d => d.DriverSeasons)
+                .ThenInclude(ds => ds.Team)
+            .Include(d => d.DriverSeasons)
+                .ThenInclude(ds => ds.Season)
             .FirstOrDefaultAsync(r => r.Id == id);
     }
 }

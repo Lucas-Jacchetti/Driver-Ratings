@@ -8,8 +8,8 @@ public static class DriverMapper
     public static DriverResponseDTO ToResponse(Driver driver) =>
         new(
             driver.Id,
-            driver.Flag,
             driver.Name,
+            driver.Flag,
             driver.DriverSeasons.Select(DriverSeasonMapper.ToSummary).ToList()
         );
 

@@ -9,7 +9,8 @@ public static class DriverSeasonQueryExtensions
         this IQueryable<DriverSeason> query) =>
         query
             .Include(ds => ds.Driver)
-            .Include(ds => ds.DriverRaceResults)
             .Include(ds => ds.Team)
-            .Include(ds => ds.Season);
+            .Include(ds => ds.Season)
+            .Include(ds => ds.DriverRaceResults)
+                .ThenInclude(drr => drr.Race);
 }
