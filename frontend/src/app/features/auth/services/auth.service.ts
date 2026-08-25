@@ -15,6 +15,9 @@ export class AuthService {
   private _currentUser = signal<UserResponseDTO | null>(this.readStoredUser());
   currentUser = this._currentUser.asReadonly();
   isAuthenticated = computed(() => this._currentUser() !== null);
+  // Pronto pro dia em que o backend passar a mandar a role -- por enquanto,
+  // sem role nenhuma vindo da API, isso sempre vai dar false.
+  isAdmin = computed(() => this._currentUser()?.role === 'Admin');
 
   loginWithGoogle(idToken: string): Observable<AuthResponseDTO> {
     const request: GoogleLoginRequest = { idToken };

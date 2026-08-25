@@ -39,6 +39,18 @@ interface NavItem {
             {{ item.label }}
           </a>
         }
+
+        @if (authService.isAdmin()) {
+          <a
+            routerLink="/admin"
+            routerLinkActive="bg-red-950/40 text-red-500"
+            class="mt-2 flex items-center gap-3 rounded-md border-t border-gray-800 px-3 pb-0 pt-3 text-sm font-medium text-gray-400 hover:bg-[#141414] hover:text-gray-100"
+            (click)="close()"
+          >
+            <app-icon name="key" [size]="18" />
+            Admin
+          </a>
+        }
       </nav>
 
       <div class="mt-auto flex items-center gap-3 border-t border-gray-800 bg-[#141414] px-4 py-4">
@@ -60,7 +72,7 @@ interface NavItem {
   `,
 })
 export class AppSidebarComponent {
-  private authService = inject(AuthService);
+  authService = inject(AuthService);
   private router = inject(Router);
 
   @Input() open = false;

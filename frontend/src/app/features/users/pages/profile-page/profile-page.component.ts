@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { scoreColorClass } from '../../../../shared/mock/f1-mock-data';
 
 @Component({
   selector: 'app-profile-page',
@@ -37,7 +36,6 @@ import { scoreColorClass } from '../../../../shared/mock/f1-mock-data';
         <p class="font-semibold text-white">{{ favoriteDriver.name }}</p>
         <p class="text-xs text-gray-500">{{ favoriteDriver.team }}</p>
       </div>
-      <span class="text-lg font-bold" [class]="scoreColorClass(favoriteDriver.score)">{{ favoriteDriver.score.toFixed(1) }}</span>
     </div>
   `,
 })
@@ -64,5 +62,4 @@ export class ProfilePageComponent {
     score: 9.1,
   };
 
-  scoreColorClass = scoreColorClass;
 }

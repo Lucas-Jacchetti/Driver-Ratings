@@ -15,6 +15,14 @@ export interface DriverRaceResultResponseDTO extends DriverRaceResultSummaryDTO 
   ratings: RatingSummaryDTO[];
 }
 
+export interface DriverRaceResultCreationDTO {
+  driverSeasonId: string;
+  raceId: string;
+  startingPosition: number;
+  finishingPosition: number;
+  context: string;
+}
+
 export interface DriverRaceResultUpdateDTO {
   driverRaceResultId: string;
   startingPosition: number;

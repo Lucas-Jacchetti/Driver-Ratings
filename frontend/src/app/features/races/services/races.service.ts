@@ -2,13 +2,22 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { RaceCreationDTO, RaceResponseDTO, RaceSummaryDTO } from '../models/race.model';
-import { DriverRaceResultSubmissionRequest } from '../models/driver-race-result.model';
+import {
+  RaceCreationDTO,
+  RaceResponseDTO,
+  RaceSummaryDTO,
+} from '../models/race.model';
+
+import {
+  DriverRaceResultSubmissionRequest,
+  DriverRaceResultSummaryDTO,
+} from '../models/driver-race-result.model';
 
 @Injectable({ providedIn: 'root' })
 export class RacesService {
   private http = inject(HttpClient);
   private baseUrl = `${environment.apiUrl}/race`;
+  private driverRaceResultUrl = `${environment.apiUrl}/driverraceresult`;
 
   getAll(): Observable<RaceSummaryDTO[]> {
     return this.http.get<RaceSummaryDTO[]>(this.baseUrl);
@@ -22,8 +31,18 @@ export class RacesService {
     return this.http.post<RaceResponseDTO>(this.baseUrl, dto);
   }
 
-  submitResults(request: DriverRaceResultSubmissionRequest): Observable<void> {
-    return this.http.put<void>(`${environment.apiUrl}/driverraceresult/bulk`, request);
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  submitResults(
+    raceId: string,
+    request: DriverRaceResultSubmissionRequest
+  ): Observable<DriverRaceResultSummaryDTO[]> {
+    return this.http.put<DriverRaceResultSummaryDTO[]>(
+      `${this.driverRaceResultUrl}/race/${raceId}`,
+      request
+    );
   }
 
   getCurrent(): Observable<RaceResponseDTO> {
@@ -32,5 +51,13 @@ export class RacesService {
 
   getAllByYear(year: number): Observable<RaceSummaryDTO[]> {
     return this.http.get<RaceSummaryDTO[]>(`${this.baseUrl}/year/${year}`);
+  }
+
+  getRaceResultsByRace(
+    raceId: string
+  ): Observable<DriverRaceResultSummaryDTO[]> {
+    return this.http.get<DriverRaceResultSummaryDTO[]>(
+      `${this.driverRaceResultUrl}/race/${raceId}`
+    );
   }
 }

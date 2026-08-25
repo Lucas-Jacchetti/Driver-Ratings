@@ -12,3 +12,7 @@ export interface SeasonResponseDTO {
   races: RaceSummaryDTO[];
   driverSeasons: DriverSeasonSummaryDTO[];
 }
+
+export interface SeasonCreationDTO {
+  year: number;
+}

@@ -9,5 +9,11 @@ export interface DriverSummaryDTO {
 export interface DriverResponseDTO {
   id: string;
   name: string;
+  flag: string;
   driverSeasons: DriverSeasonSummaryDTO[];
+}
+
+export interface DriverCreationDTO {
+  name: string;
+  flag: string;
 }

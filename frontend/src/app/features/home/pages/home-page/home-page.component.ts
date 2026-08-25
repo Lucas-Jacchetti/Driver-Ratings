@@ -270,7 +270,7 @@ export class HomePageComponent implements OnInit {
   private originalScores: Record<string, number | undefined> = {};
 
   ngOnInit(): void {
-    this.racesService.getById('019ff221-4c49-732b-a88a-40a991b6b180').subscribe({
+    this.racesService.getCurrent().subscribe({
       next: (race) => {
         race.driverRaceResults = [...race.driverRaceResults].sort(
           (a, b) =>
