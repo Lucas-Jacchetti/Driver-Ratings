@@ -1,5 +1,6 @@
 using backend.Domain.Interfaces;
 using backend.Feature.DriverSeasons.DataManipulation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Feature.DriverSeasons;
@@ -36,6 +37,7 @@ public class DriverSeasonController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(DriverSeasonCreationDTO request)
     {
         var driverSeason = DriverSeasonMapper.ToDomain(request);
@@ -51,6 +53,7 @@ public class DriverSeasonController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var driverSeason = await _service.DeleteAsync(id);

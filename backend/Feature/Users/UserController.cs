@@ -16,7 +16,7 @@ public class UserController : ControllerBase
         _service = service;
     }
 
-    [Authorize] //admin
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -24,7 +24,7 @@ public class UserController : ControllerBase
         return Ok(users.Select(UserMapper.ToResponse).ToList());
     }
 
-    [Authorize] //admin
+    [Authorize(Roles = "Admin")]
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -38,7 +38,7 @@ public class UserController : ControllerBase
         return Ok(UserMapper.ToResponse(user));
     }
 
-    [Authorize] //admin
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

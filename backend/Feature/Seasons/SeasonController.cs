@@ -36,7 +36,7 @@ public class SeasonController : ControllerBase
         return Ok(SeasonMapper.ToResponse(season));
     }
 
-    [Authorize] //admin
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> Create(SeasonCreationDTO request)
     {
@@ -51,7 +51,7 @@ public class SeasonController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = seasonCreated.Id }, SeasonMapper.ToResponse(seasonCreated));
     }
 
-    [Authorize] //admin
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

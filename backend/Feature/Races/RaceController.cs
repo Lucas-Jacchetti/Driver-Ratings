@@ -36,7 +36,7 @@ public class RaceController : ControllerBase
         return Ok(RaceMapper.ToResponse(race));
     }
 
-    [Authorize] //admin
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> Create(RaceCreationDTO request)
     {
@@ -66,7 +66,7 @@ public class RaceController : ControllerBase
         return Ok(races.Select(RaceMapper.ToResponse).ToList());
     }
 
-    [Authorize] //admin
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

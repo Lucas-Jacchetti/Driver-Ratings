@@ -54,7 +54,7 @@ public class CommunityController : ControllerBase
         return CreatedAtAction(nameof(GetById), response);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

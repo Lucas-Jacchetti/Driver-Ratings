@@ -1,5 +1,6 @@
 using backend.Domain.Interfaces;
 using backend.Feature.Drivers.DataManipulation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Feature.Drivers;
@@ -36,6 +37,7 @@ public class DriverController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(DriverCreationDTO request)
     {
         var driver = DriverMapper.ToDomain(request);
@@ -50,6 +52,7 @@ public class DriverController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var driver = await _service.DeleteAsync(id);

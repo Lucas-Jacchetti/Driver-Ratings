@@ -1,3 +1,5 @@
+using backend.Domain.Roles;
+
 namespace backend.Domain.Entities;
 
 public class User
@@ -7,4 +9,5 @@ public class User
     public required string Email { get; set; }
     public required string GoogleId { get; set; }
     public DateTime CreatedAt { get; set; }
+    public UserRoles UserRoles { get; set; } = UserRoles.User;
 }

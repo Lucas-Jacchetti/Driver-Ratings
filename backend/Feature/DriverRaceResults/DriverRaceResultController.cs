@@ -49,7 +49,7 @@ public class DriverRaceResultController : ControllerBase
         return Ok(results.Select(DriverRaceResultMapper.ToSummary).ToList());
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> Create(DriverRaceResultCreationDTO request)
     {
@@ -65,7 +65,7 @@ public class DriverRaceResultController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPut("race/{raceId:guid}")]
     public async Task<IActionResult> UpdateRaceResults(Guid raceId, DriverRaceResultSubmissionRequest request)
     {
@@ -83,7 +83,7 @@ public class DriverRaceResultController : ControllerBase
         return Ok(response);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

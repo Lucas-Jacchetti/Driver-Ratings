@@ -23,7 +23,7 @@ public class TeamController : ControllerBase
         return Ok(TeamMapper.ToResponse(teams));
     }
 
-    [Authorize] //admin
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> Create(TeamCreationDTO request)
     {
@@ -51,7 +51,7 @@ public class TeamController : ControllerBase
         return Ok(TeamMapper.ToResponse(team));
     }
 
-    [Authorize] //admin
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
