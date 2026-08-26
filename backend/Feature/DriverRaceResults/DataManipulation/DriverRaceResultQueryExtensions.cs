@@ -15,5 +15,6 @@ public static class DriverRaceResultQueryExtensions
             .Include(drr => drr.DriverSeason)
                 .ThenInclude(ds => ds.Season)
             .Include(drr => drr.Race)
-            .Include(drr => drr.Ratings);
+            .Include(drr => drr.Ratings)
+            .ThenInclude(r => r.User);
 }

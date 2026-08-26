@@ -20,6 +20,6 @@ public class DriverRaceResultConfiguration : IEntityTypeConfiguration<DriverRace
         builder.HasOne(r => r.Race)
             .WithMany(race => race.DriverRaceResults)
             .HasForeignKey(r => r.RaceId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -1,24 +1,21 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IconComponent } from '../../../../shared/components/icon.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner.component';
 import { RacesService } from '../../../races/services/races.service';
 import { SeasonsService } from '../../../seasons/services/seasons.service';
 import { RaceSummaryDTO } from '../../../races/models/race.model';
-import {
-  DriverRaceResultSummaryDTO,
-  DriverRaceResultSubmissionRequest,
-} from '../../../races/models/driver-race-result.model';
+import { DriverRaceResultSummaryDTO, DriverRaceResultSubmissionRequest, } from '../../../races/models/driver-race-result.model';
 import { SeasonSummaryDTO } from '../../../seasons/models/season.model';
 import { extractApiError } from '../../../../shared/utils/http-error';
 
 @Component({
   selector: 'app-admin-race-results-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent, LoadingSpinnerComponent],
+  imports: [CommonModule, FormsModule, LoadingSpinnerComponent],
   template: `
     <h1 class="text-xl font-bold text-white">Admin · Race Results</h1>
+
     <p class="mb-5 text-sm text-gray-500">
       Update the results of a completed race
     </p>
@@ -42,6 +39,7 @@ import { extractApiError } from '../../../../shared/utils/http-error';
         (ngModelChange)="onRaceChange()"
       >
         <option value="" disabled>Select a race</option>
+
         @for (race of races(); track race.id) {
           <option [value]="race.id">{{ race.name }}</option>
         }
@@ -49,7 +47,9 @@ import { extractApiError } from '../../../../shared/utils/http-error';
     </div>
 
     @if (errorMessage()) {
-      <p class="mb-4 text-sm text-red-400">{{ errorMessage() }}</p>
+      <p class="mb-4 text-sm text-red-400">
+        {{ errorMessage() }}
+      </p>
     }
 
     @if (loading()) {
@@ -63,12 +63,14 @@ import { extractApiError } from '../../../../shared/utils/http-error';
         @for (result of results(); track result.id) {
           <div class="rounded-lg border border-gray-800 bg-[#141414] px-5 py-4">
             <div class="mb-3 flex items-center gap-3">
-              <div class="flex h-5 w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm">
+              <div
+                class="flex h-5 w-7 shrink-0 items-center justify-center overflow-hidden rounded-sm"
+              >
                 <img
                   [src]="flagUrl(result.driverSeason.driver.flag)"
                   alt=""
                   class="h-full w-full object-cover"
-                  onerror="this.style.display='none'"
+                  onerror="*this*.style.display='none'"
                 />
               </div>
 
@@ -79,9 +81,12 @@ import { extractApiError } from '../../../../shared/utils/http-error';
 
             <div class="flex flex-wrap items-end gap-3">
               <div class="w-28">
-                <label class="mb-1 block text-xs uppercase tracking-wide text-gray-500">
+                <label
+                  class="mb-1 block text-xs uppercase tracking-wide text-gray-500"
+                >
                   Started
                 </label>
+
                 <input
                   class="app-input"
                   type="number"
@@ -93,9 +98,12 @@ import { extractApiError } from '../../../../shared/utils/http-error';
               </div>
 
               <div class="w-28">
-                <label class="mb-1 block text-xs uppercase tracking-wide text-gray-500">
+                <label
+                  class="mb-1 block text-xs uppercase tracking-wide text-gray-500"
+                >
                   Finished
                 </label>
+
                 <input
                   class="app-input"
                   type="number"
@@ -107,9 +115,12 @@ import { extractApiError } from '../../../../shared/utils/http-error';
               </div>
 
               <div class="min-w-[220px] flex-1">
-                <label class="mb-1 block text-xs uppercase tracking-wide text-gray-500">
+                <label
+                  class="mb-1 block text-xs uppercase tracking-wide text-gray-500"
+                >
                   Context
                 </label>
+
                 <input
                   class="app-input"
                   [(ngModel)]="result.context"
@@ -127,14 +138,19 @@ import { extractApiError } from '../../../../shared/utils/http-error';
       </div>
 
       @if (results().length) {
-        <div class="mt-5 flex justify-end">
+        <div class="mt-5 flex items-center justify-end gap-4">
+          @if (saved()) {
+            <span class="text-sm text-green-400">
+              Results saved successfully.
+            </span>
+          }
+
           <button
             type="button"
             class="app-button-primary px-4 py-2"
             [disabled]="saving()"
             (click)="save()"
           >
-            <app-icon name="save" [size]="15" />
             {{ saving() ? 'Saving...' : 'Save Results' }}
           </button>
         </div>
@@ -152,6 +168,7 @@ export class AdminRaceResultsPageComponent implements OnInit {
 
   loading = signal(true);
   saving = signal(false);
+  saved = signal(false);
   errorMessage = signal('');
 
   selectedSeasonId = '';
@@ -161,6 +178,7 @@ export class AdminRaceResultsPageComponent implements OnInit {
     this.seasonsService.getAll().subscribe({
       next: seasons => {
         const sorted = [...seasons].sort((a, b) => b.year - a.year);
+
         this.seasons.set(sorted);
         this.selectedSeasonId = sorted[0]?.id ?? '';
         this.loadRaces();
@@ -172,15 +190,19 @@ export class AdminRaceResultsPageComponent implements OnInit {
   onSeasonChange(): void {
     this.selectedRaceId = '';
     this.results.set([]);
+    this.saved.set(false);
     this.loadRaces();
   }
 
   onRaceChange(): void {
+    this.saved.set(false);
     this.loadResults();
   }
 
   private loadRaces(): void {
-    const season = this.seasons().find(s => s.id === this.selectedSeasonId);
+    const season = this.seasons().find(
+      s => s.id === this.selectedSeasonId
+    );
 
     if (!season) {
       this.loading.set(false);
@@ -189,6 +211,7 @@ export class AdminRaceResultsPageComponent implements OnInit {
 
     this.loading.set(true);
     this.errorMessage.set('');
+    this.saved.set(false);
 
     this.racesService.getAllByYear(season.year).subscribe({
       next: races => {
@@ -221,24 +244,29 @@ export class AdminRaceResultsPageComponent implements OnInit {
 
     this.loading.set(true);
     this.errorMessage.set('');
+    this.saved.set(false);
 
-    this.racesService.getRaceResultsByRace(this.selectedRaceId).subscribe({
-      next: results => {
-        this.results.set(
-          [...results].sort(
-            (a, b) =>
-              a.driverSeason.driverNumber - b.driverSeason.driverNumber
-          )
-        );
-        this.loading.set(false);
-      },
-      error: err => {
-        this.errorMessage.set(
-          extractApiError(err, 'Could not load race results.')
-        );
-        this.loading.set(false);
-      },
-    });
+    this.racesService
+      .getRaceResultsByRace(this.selectedRaceId)
+      .subscribe({
+        next: results => {
+          this.results.set(
+            [...results].sort(
+              (a, b) =>
+                a.driverSeason.driverNumber -
+                b.driverSeason.driverNumber
+            )
+          );
+
+          this.loading.set(false);
+        },
+        error: err => {
+          this.errorMessage.set(
+            extractApiError(err, 'Could not load race results.')
+          );
+          this.loading.set(false);
+        },
+      });
   }
 
   flagUrl(countryCode: string): string {
@@ -247,6 +275,10 @@ export class AdminRaceResultsPageComponent implements OnInit {
 
   save(): void {
     if (!this.selectedRaceId || !this.results().length) return;
+
+    this.saving.set(true);
+    this.saved.set(false);
+    this.errorMessage.set('');
 
     const request: DriverRaceResultSubmissionRequest = {
       results: this.results().map(result => ({
@@ -257,22 +289,28 @@ export class AdminRaceResultsPageComponent implements OnInit {
       })),
     };
 
-    this.racesService.submitResults(this.selectedRaceId, request).subscribe({
-      next: results => {
-        this.results.set(
-          [...results].sort(
-            (a, b) =>
-              a.driverSeason.driverNumber - b.driverSeason.driverNumber
-          )
-        );
-        this.saving.set(false);
-      },
-      error: err => {
-        this.errorMessage.set(
-          extractApiError(err, 'Could not save race results.')
-        );
-        this.saving.set(false);
-      },
-    });
+    this.racesService
+      .submitResults(this.selectedRaceId, request)
+      .subscribe({
+        next: results => {
+          this.results.set(
+            [...results].sort(
+              (a, b) =>
+                a.driverSeason.driverNumber -
+                b.driverSeason.driverNumber
+            )
+          );
+
+          this.saving.set(false);
+          this.saved.set(true);
+        },
+        error: err => {
+          this.errorMessage.set(
+            extractApiError(err, 'Could not save race results.')
+          );
+          this.saving.set(false);
+          this.saved.set(false);
+        },
+      });
   }
 }

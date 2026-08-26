@@ -204,7 +204,7 @@ export class AdminDriverSeasonsPageComponent implements OnInit {
 
     this.seasonsService.deleteDriverSeason(id).subscribe({
       next: () => this.reloadDriverSeasons(),
-      error: (err) => this.errorMessage.set(extractApiError(err, 'Could not remove this link.')),
+      error: (err) => this.errorMessage.set(extractApiError(err, 'Could not remove this link, this driver already has results associated with him.')),
     });
   }
 
