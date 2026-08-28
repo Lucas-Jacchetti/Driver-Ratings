@@ -45,4 +45,13 @@ export class AuthService {
     const raw = localStorage.getItem(USER_KEY);
     return raw ? JSON.parse(raw) : null;
   }
+
+  refreshCurrentUser(): Observable<UserResponseDTO> {
+    return this.http.get<UserResponseDTO>(`${environment.apiUrl}/user/me`).pipe(
+      tap((user) => {
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
+        this._currentUser.set(user);
+      })
+    );
+  }
 }

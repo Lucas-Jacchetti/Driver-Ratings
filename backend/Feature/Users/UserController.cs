@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using backend.Domain.Interfaces;
 using backend.Feature.Users.DataManipulation;
 using Microsoft.AspNetCore.Authorization;
@@ -50,5 +51,17 @@ public class UserController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> GetMe()
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var user = await _service.GetByIdAsync(userId);
+
+        if (user is null) return NotFound();
+
+        return Ok(UserMapper.ToResponse(user));
     }
 }
