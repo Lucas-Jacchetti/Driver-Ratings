@@ -1,13 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../auth/services/auth.service';
+import { Router } from '@angular/router';
+import { IconComponent } from "../../../../shared/components/icon.component";
 
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   template: `
-    <h1 class="text-xl font-bold text-white">Perfil</h1>
-    <p class="mb-5 text-sm text-gray-500">Seu histórico de avaliações</p>
+    <h1 class="text-xl font-bold text-white mb-5">Profile</h1>
 
     <div class="mb-6 flex items-center gap-4 rounded-lg border border-gray-800 bg-[#141414] p-5">
       <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-red-600 text-xl font-semibold text-white">
@@ -16,50 +18,38 @@ import { CommonModule } from '@angular/common';
       <div>
         <p class="text-lg font-bold text-white">{{ user.name }}</p>
         <p class="text-sm text-gray-500">{{ user.email }}</p>
-        <p class="text-xs text-gray-600">Membro desde {{ user.memberSince }}</p>
+        <p class="text-xs text-gray-600">Joined at {{ user.memberSince }}</p>
       </div>
     </div>
-
-    <div class="mb-6 grid grid-cols-2 gap-4">
-      @for (stat of stats; track stat.label) {
-        <div class="rounded-lg border border-gray-800 bg-[#141414] p-4">
-          <p class="text-2xl font-bold text-red-500">{{ stat.value }}</p>
-          <p class="text-sm text-gray-500">{{ stat.label }}</p>
-        </div>
-      }
-    </div>
-
-    <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Piloto Favorito</p>
-    <div class="flex items-center gap-3 rounded-lg border border-gray-800 bg-[#141414] p-4">
-      <span class="text-xs font-semibold text-gray-500">{{ favoriteDriver.flag }}</span>
-      <div class="flex-1">
-        <p class="font-semibold text-white">{{ favoriteDriver.name }}</p>
-        <p class="text-xs text-gray-500">{{ favoriteDriver.team }}</p>
-      </div>
-    </div>
+    <div class="rounded-lg border border-gray-800 bg-[#141414]">
+    <button
+      type="button"
+      class="flex w-full items-center gap-3 px-5 py-3 text-left text-sm font-medium text-red-500 hover:text-red-400"
+      (click)="logout()"
+    >
+      <app-icon name="logout" [size]="16" />
+      Log off
+    </button>
+  </div>
   `,
 })
 export class ProfilePageComponent {
-  // Mock -- substituir por UsersService.getById() quando integrar.
-  user = {
-    initial: 'L',
-    name: 'Lucas',
-    email: 'lucas@email.com',
-    memberSince: 'Jan 2024',
-  };
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  get user() {
+    const currentUser = this.authService.currentUser();
+    return {
+      initial: currentUser?.name.charAt(0).toUpperCase() ?? '?',
+      name: currentUser?.name ?? 'User',
+      email: currentUser?.email ?? '',
+      memberSince: currentUser?.createdAt ? new Date(currentUser.createdAt).toLocaleDateString() : '',
+    };
+  }
 
-  stats = [
-    { label: 'Corridas Avaliadas', value: '3' },
-    { label: 'Pilotos Avaliados', value: '30' },
-    { label: 'Média Geral Dada', value: '7.8' },
-    { label: 'Seguidores', value: '14' },
-  ];
 
-  favoriteDriver = {
-    flag: 'NL',
-    name: 'Max Verstappen',
-    team: 'Red Bull Racing',
-    score: 9.1,
-  };
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 
 }

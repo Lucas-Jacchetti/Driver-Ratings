@@ -103,6 +103,9 @@ import { Component, Input } from '@angular/core';
           <path d="M7 7l1 13a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l1-13" />
           <path d="M10 11v6M14 11v6" />
         }
+        @case ('star') {
+          <path d="M12 3.5 14.5 9l6 .6-4.5 4 1.3 5.9L12 16.6l-5.3 2.9L8 13.6l-4.5-4 6-.6L12 3.5Z" />
+        }
       }
     </svg>
   `,

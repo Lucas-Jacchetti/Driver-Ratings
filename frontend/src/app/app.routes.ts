@@ -54,13 +54,6 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'settings',
-    loadComponent: () =>
-      import('./features/users/pages/settings-page/settings-page.component').then(
-        (m) => m.SettingsPageComponent
-      ),
-  },
-  {
     path: 'admin',
     canActivate: [adminGuard],
     loadComponent: () =>

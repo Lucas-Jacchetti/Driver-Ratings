@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { IconComponent } from '../../shared/components/icon.component';
@@ -30,7 +30,7 @@ interface NavItem {
         @for (item of navItems; track item.path) {
           <a
             [routerLink]="item.path"
-            routerLinkActive="bg-red-950/40 text-red-500"
+            routerLinkActive="!bg-red-950/40 !text-red-500"
             [routerLinkActiveOptions]="{ exact: !!item.exact }"
             class="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-gray-400 hover:bg-[#141414] hover:text-gray-100"
             (click)="close()"
@@ -43,8 +43,8 @@ interface NavItem {
         @if (authService.isAdmin()) {
           <a
             routerLink="/admin"
-            routerLinkActive="bg-red-950/40 text-red-500"
-            class="mt-2 flex items-center gap-3 rounded-md border-t border-gray-800 px-3 pb-0 pt-3 text-sm font-medium text-gray-400 hover:bg-[#141414] hover:text-gray-100"
+            routerLinkActive="!bg-red-950/40 !text-red-500"
+            class="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-gray-400 hover:bg-[#141414] hover:text-gray-100"
             (click)="close()"
           >
             <app-icon name="key" [size]="18" />
@@ -53,17 +53,19 @@ interface NavItem {
         }
       </nav>
 
+      @if (authService.isAuthenticated()) {
       <div class="mt-auto flex items-center gap-3 border-t border-gray-800 bg-[#141414] px-4 py-4">
-        <img
-          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%23e10600'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' dominant-baseline='middle' font-size='26' font-family='Arial, sans-serif' font-weight='700' fill='white'%3EL%3C/text%3E%3C/svg%3E"
-          alt="Avatar do usuário"
-          class="h-9 w-9 shrink-0 rounded-full object-cover"
-        />
+        <div
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-600 text-sm font-bold text-white"
+        >
+          {{ userInitial() }}
+        </div>
         <div class="min-w-0">
-          <p class="truncate text-sm font-medium text-white">{{ userName }}</p>
-          <p class="truncate text-xs text-gray-500">{{ userEmail }}</p>
+          <p class="truncate text-sm font-medium text-white">{{ authService.currentUser()?.name }}</p>
+          <p class="truncate text-xs text-gray-500">{{ authService.currentUser()?.email }}</p>
         </div>
       </div>
+    }
     </aside>
 
     @if (open) {
@@ -78,17 +80,16 @@ export class AppSidebarComponent {
   @Input() open = false;
   @Output() openChange = new EventEmitter<boolean>();
 
-  // Mock -- substituir por dado real do usuário logado quando integrar.
-  userName = 'Lucas';
-  userEmail = 'lucas@email.com';
-  userInitial = 'L';
+  userInitial = computed(() => {
+    const name = this.authService.currentUser()?.name;
+    return name ? name.charAt(0).toUpperCase() : '?';
+  });
 
   navItems: NavItem[] = [
-    { label: 'Rate Drivers', path: '/', icon: 'home', exact: true },
-    { label: 'Rankings', path: '/races', icon: 'history' },
+    { label: 'Rate Drivers', path: '/', icon: 'star', exact: true },
+    { label: 'Rankings', path: '/races', icon: 'trophy' },
     { label: 'Community', path: '/communities', icon: 'users' },
     { label: 'Profile', path: '/profile', icon: 'user' },
-    { label: 'Settings', path: '/settings', icon: 'settings' },
   ];
 
   close(): void {
