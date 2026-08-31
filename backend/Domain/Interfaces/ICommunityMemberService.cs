@@ -9,4 +9,5 @@ public interface ICommunityMemberService
     Task<Result<CommunityMember>> CreateAsync(CommunityMember communityMember, string? accessToken);
     Task<CommunityMember?> GetByIdAsync(Guid id);
     Task<CommunityMember?> DeleteAsync(Guid communityMemberId);
+    Task<bool> IsMemberAsync(Guid communityId, Guid userId);
 }

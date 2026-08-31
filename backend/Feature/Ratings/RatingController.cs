@@ -14,10 +14,12 @@ namespace backend.Feature.Ratings;
 public class RatingController : ControllerBase
 {
     private readonly IRatingService _service;
+    private readonly ICommunityMemberService _communityMemberService;
 
-    public RatingController(IRatingService service)
+    public RatingController(IRatingService service, ICommunityMemberService communityMemberService)
     {
         _service = service;
+        _communityMemberService = communityMemberService;
     }
 
     [Authorize(Roles = "Admin")]
@@ -160,5 +162,22 @@ public class RatingController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    
+    [Authorize]
+    [HttpGet("community/{communityId:guid}")]
+    public async Task<IActionResult> GetCommunityRatings(Guid communityId, [FromQuery] int year, [FromQuery] Guid? raceId)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var isMember = await _communityMemberService.IsMemberAsync(communityId, userId);
+        if (!isMember)
+        {
+            return Forbid();
+        }
+
+        var ratings = await _service.GetCommunityRatingsAsync(year, communityId, raceId);
+        return Ok(ratings);
     }
 }

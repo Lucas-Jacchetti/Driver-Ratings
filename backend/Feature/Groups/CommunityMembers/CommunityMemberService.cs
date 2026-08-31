@@ -69,4 +69,10 @@ public class CommunityMemberService : ICommunityMemberService
             .IncludeForMapping()
             .FirstOrDefaultAsync(r => r.Id == id);
     }
+
+    public async Task<bool> IsMemberAsync(Guid communityId, Guid userId)
+    {
+        return await _dbContext.CommunityMembers
+            .AnyAsync(cm => cm.CommunityId == communityId && cm.UserId == userId);
+    }
 }

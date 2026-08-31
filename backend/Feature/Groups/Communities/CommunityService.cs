@@ -44,11 +44,21 @@ public class CommunityService : ICommunityService
         return Community;
     }
 
-    public async Task<ICollection<Community>> GetAllAsync()
+    public async Task<PagedResult<Community>> GetAllAsync(int page, int pageSize)
     {
-        return await _dbContext.Communities
-            .IncludeForMapping()
+        var query = _dbContext.Communities
+            .Where(c => c.IsPublic)
+            .IncludeForMapping();
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderByDescending(c => _dbContext.CommunityMembers.Count(cm => cm.CommunityId == c.Id))
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        return new PagedResult<Community>(items, totalCount, page, pageSize);
     }
 
     public async Task<Community?> GetByIdAsync(Guid id)
@@ -56,5 +66,12 @@ public class CommunityService : ICommunityService
         return await _dbContext.Communities
             .IncludeForMapping()
             .FirstOrDefaultAsync(r => r.Id == id);
+    }
+
+    public async Task<Community?> GetByAccessCodeAsync(string accessCode)
+    {
+        return await _dbContext.Communities
+            .IncludeForMapping()
+            .FirstOrDefaultAsync(c => c.AccessCode == accessCode);
     }
 }

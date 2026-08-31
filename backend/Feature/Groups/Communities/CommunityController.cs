@@ -18,10 +18,18 @@ public class CommunityController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
-        var community = await _service.GetAllAsync();
-        return Ok(community.Select(CommunityMapper.ToResponse).ToList());
+        var result = await _service.GetAllAsync(page, pageSize);
+
+        return Ok(new
+        {
+            items = result.Items.Select(CommunityMapper.ToResponse).ToList(),
+            totalCount = result.TotalCount,
+            page = result.Page,
+            pageSize = result.PageSize,
+            totalPages = result.TotalPages
+        });
     }
 
     [HttpGet("{id:guid}")]
@@ -32,6 +40,20 @@ public class CommunityController : ControllerBase
         if (community is null)
         {
             return NotFound();
+        }
+
+        return Ok(CommunityMapper.ToResponse(community));
+    }
+
+    [Authorize]
+    [HttpGet("by-code/{accessCode}")]
+    public async Task<IActionResult> GetByAccessCode(string accessCode)
+    {
+        var community = await _service.GetByAccessCodeAsync(accessCode);
+
+        if (community is null)
+        {
+            return NotFound(new { error = "Invalid access code." });
         }
 
         return Ok(CommunityMapper.ToResponse(community));
