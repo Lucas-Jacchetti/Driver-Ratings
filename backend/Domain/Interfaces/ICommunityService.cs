@@ -10,4 +10,6 @@ public interface ICommunityService
     Task<Community?> GetByIdAsync(Guid id);
     Task<Community?> DeleteAsync(Guid communityId);
     Task<Community?> GetByAccessCodeAsync(string accessCode);
+    Task<PagedResult<Community>> GetMy(int page, int pageSize, Guid userId);
+
 }

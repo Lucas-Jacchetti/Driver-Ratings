@@ -32,6 +32,23 @@ public class CommunityController : ControllerBase
         });
     }
 
+    [Authorize]
+    [HttpGet("my")]
+    public async Task<IActionResult> GetMy([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var result = await _service.GetMy(page, pageSize, userId);
+
+        return Ok(new
+        {
+            items = result.Items.Select(CommunityMapper.ToResponse).ToList(),
+            totalCount = result.TotalCount,
+            page = result.Page,
+            pageSize = result.PageSize,
+            totalPages = result.TotalPages
+        });
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {

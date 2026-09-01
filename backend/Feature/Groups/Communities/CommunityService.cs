@@ -74,4 +74,21 @@ public class CommunityService : ICommunityService
             .IncludeForMapping()
             .FirstOrDefaultAsync(c => c.AccessCode == accessCode);
     }
+
+    public async Task<PagedResult<Community>> GetMy(int page, int pageSize, Guid userId)
+    {
+        var query = _dbContext.Communities
+            .Where(c => c.HostId == userId || c.Members.Any(cm => cm.UserId == userId))
+            .IncludeForMapping();
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderByDescending(c => _dbContext.CommunityMembers.Count(cm => cm.CommunityId == c.Id))
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return new PagedResult<Community>(items, totalCount, page, pageSize);
+    }
 }
