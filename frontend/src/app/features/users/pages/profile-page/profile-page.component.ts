@@ -28,7 +28,7 @@ import { IconComponent } from "../../../../shared/components/icon.component";
       (click)="logout()"
     >
       <app-icon name="logout" [size]="16" />
-      Log off
+      Log out
     </button>
   </div>
   `,
