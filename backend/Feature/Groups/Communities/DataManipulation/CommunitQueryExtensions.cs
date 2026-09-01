@@ -9,5 +9,6 @@ public static class CommunityQueryExtensions
         this IQueryable<Community> query) =>
         query
             .Include(ds => ds.Host)
-            .Include(ds => ds.Members);
+            .Include(ds => ds.Members)
+                .ThenInclude(m => m.User);
 }

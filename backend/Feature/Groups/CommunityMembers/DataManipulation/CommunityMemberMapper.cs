@@ -19,7 +19,7 @@ public static class CommunityMemberMapper
         return new CommunityMemberResponseDTO(
             member.Id,
             member.CommunityId,
-            member.Community.Name,
+            member.Community?.Name ?? string.Empty,
             UserMapper.ToSummary(member.User),
             member.JoinedAt
         );
