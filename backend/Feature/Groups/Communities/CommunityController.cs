@@ -90,7 +90,7 @@ public class CommunityController : ControllerBase
         }
 
         var response = CommunityMapper.ToResponse(result.Value!);
-        return CreatedAtAction(nameof(GetById), response);
+        return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
     }
 
     [Authorize(Roles = "Admin")]

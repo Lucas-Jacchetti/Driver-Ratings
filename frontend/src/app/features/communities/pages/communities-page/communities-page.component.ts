@@ -3,7 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../../../shared/components/icon.component';
 import { CommunitiesService } from '../../services/communities.service';
-import { CommunityResponseDTO, PagedResult } from '../../models/community.model';
+import {
+  CommunityResponseDTO,
+  CommunityCreationDTO,
+  PagedResult,
+} from '../../models/community.model';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../../auth/services/auth.service';
 
@@ -14,40 +18,51 @@ type ViewMode = 'All' | 'Mine';
   standalone: true,
   imports: [CommonModule, FormsModule, IconComponent],
   template: `
-    <div class="mb-1 flex items-start justify-between gap-4">
-      <h1 class="text-xl font-bold text-white">Communities</h1>
-      <button type="button" class="app-button-primary" (click)="openJoinModal()">
-        <app-icon name="link" [size]="15" />
-        Join with Code
-      </button>
+    <div class="mb-5 flex items-start justify-between gap-4">
+      <div>
+        <h1 class="text-xl font-bold text-white">Communities</h1>
+        <p class="text-sm text-gray-500">Find and join communities</p>
+      </div>
     </div>
-    <p class="mb-5 text-sm text-gray-500">Find and join communities</p>
 
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div class="relative w-full sm:max-w-md">
-        <app-icon name="search" [size]="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-        <input
-          type="text"
-          class="app-input pl-9 pr-3"
-          placeholder="Buscar comunidades..."
-          [(ngModel)]="search"
-          name="search"
-        />
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="relative w-full sm:max-w-md">
+          <app-icon name="search" [size]="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+          <input
+            type="text"
+            class="app-input pl-9 pr-3"
+            placeholder="Buscar comunidades..."
+            [(ngModel)]="search"
+            name="search"
+          />
+        </div>
+
+        <div class="inline-flex w-fit flex-row flex-nowrap items-center gap-1 rounded-md bg-[#141414] p-1">
+          @for (mode of viewModes; track mode) {
+            <button
+              type="button"
+              class="whitespace-nowrap rounded px-4 py-2 text-sm font-medium"
+              [class.bg-red-600]="activeView === mode"
+              [class.text-white]="activeView === mode"
+              [class.text-gray-400]="activeView !== mode"
+              (click)="setView(mode)"
+            >
+              {{ mode }}
+            </button>
+          }
+        </div>
       </div>
 
-      <div class="flex flex-wrap gap-1 rounded-md bg-[#141414] p-1">
-        @for (mode of viewModes; track mode) {
-          <button
-            type="button"
-            class="rounded px-3 py-1.5 text-xs font-medium"
-            [class.bg-red-600]="activeView === mode"
-            [class.text-white]="activeView === mode"
-            [class.text-gray-400]="activeView !== mode"
-            (click)="setView(mode)"
-          >
-            {{ mode }}
-          </button>
-        }
+      <div class="flex flex-wrap items-center gap-3">
+        <button type="button" class="app-button-secondary whitespace-nowrap" (click)="openCreateModal()">
+          <app-icon name="plus" [size]="15" />
+          Create Community
+        </button>
+        <button type="button" class="app-button-primary whitespace-nowrap" (click)="openJoinModal()">
+          <app-icon name="link" [size]="15" />
+          Join with Code
+        </button>
       </div>
     </div>
 
@@ -86,7 +101,11 @@ type ViewMode = 'All' | 'Mine';
               <div class="flex items-center justify-between">
                 <span class="flex items-center gap-1.5 text-xs text-gray-500">
                   <app-icon name="users" [size]="14" />
-                  {{ community.members.length }} members
+                  @if(community.members.length === 1) {
+                    1 member
+                  } @else {
+                    {{ community.members.length }} members
+                  }
                 </span>
                 @if (activeView === 'All') {
                   <button
@@ -109,7 +128,7 @@ type ViewMode = 'All' | 'Mine';
 
     @if (showJoinModal) {
       <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" (click)="closeJoinModal()">
-        <div class="w-full max-w-sm rounded-lg bg-[#141414] p-6" (click)="$event.stopPropagation()">
+        <div class="w-full max-w-sm rounded-lg bg-[#141414] p-4 sm:p-6" (click)="$event.stopPropagation()">
           @if (!foundCommunity) {
             <h2 class="mb-1 text-lg font-bold text-white">Enter Code</h2>
             <p class="mb-4 text-sm text-gray-500">Enter the private community code to find it.</p>
@@ -136,19 +155,111 @@ type ViewMode = 'All' | 'Mine';
             <p class="mb-4 text-sm text-gray-400">
               {{ foundCommunity.description }}
             </p>
+            @if (isMember(foundCommunity)) {
+              <button
+                type="button"
+                class="app-button-secondary w-full pointer-events-none"
+                disabled
+              >
+                Already In
+              </button>
+            } @else {
+              <div class="flex gap-3">
+                <button type="button" class="app-button-secondary flex-1" (click)="closeJoinModal()">
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  class="app-button-primary flex-1"
+                  (click)="joinCommunity(foundCommunity, accessCode)"
+                >
+                  Enter
+                </button>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    }
+
+    @if (showCreateModal) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" (click)="closeCreateModal()">
+        <div class="w-full max-w-sm rounded-lg bg-[#141414] p-4 sm:p-6" (click)="$event.stopPropagation()">
+          @if (!createdCommunity) {
+            <h2 class="mb-1 text-lg font-bold text-white">Create Community</h2>
+            <p class="mb-4 text-sm text-gray-500">Fill in the details for your new community.</p>
+
+            <label class="mb-1 block text-xs font-medium text-gray-400">Name</label>
+            <input
+              type="text"
+              class="app-input mb-3"
+              placeholder="Community name"
+              [(ngModel)]="createForm.name"
+              name="createName"
+            />
+
+            <label class="mb-1 block text-xs font-medium text-gray-400">Description</label>
+            <textarea
+              class="app-input mb-3 resize-none"
+              rows="3"
+              placeholder="Description"
+              [(ngModel)]="createForm.description"
+              name="createDescription"
+            ></textarea>
+
+            <label class="mb-1 block text-xs font-medium text-gray-400">Image URL</label>
+            <input
+              type="text"
+              class="app-input mb-3 w-full"
+              placeholder="Optional image URL"
+              [(ngModel)]="createForm.imgUrl"
+              name="createImgUrl"
+            />
+
+            <label class="mb-1 block text-xs font-medium text-gray-400">Visibility</label>
+            <select
+              class="app-input mb-4 w-full"
+              [class.text-gray-500]="!createVisibility"
+              [(ngModel)]="createVisibility"
+              name="createVisibility"
+            >
+              <option value="" disabled>Visibility</option>
+              <option value="public">Public</option>
+              <option value="private">Private</option>
+            </select>
+
+            @if (createError) {
+              <p class="mb-3 text-xs text-red-500">{{ createError }}</p>
+            }
+
             <div class="flex gap-3">
-              <button type="button" class="app-button-secondary flex-1" (click)="closeJoinModal()">
+              <button type="button" class="app-button-secondary flex-1" (click)="closeCreateModal()">
                 Cancel
               </button>
               <button
                 type="button"
                 class="app-button-primary flex-1"
-                [disabled]="isMember(foundCommunity)"
-                (click)="joinCommunity(foundCommunity, accessCode)"
+                [disabled]="!createForm.name.trim() || !createVisibility || creating"
+                (click)="submitCreate()"
               >
-                {{ isMember(foundCommunity) ? 'Already In' : 'Enter' }}
+                {{ creating ? 'Creating...' : 'Create' }}
               </button>
             </div>
+          } @else {
+            <h2 class="mb-1 text-lg font-bold text-white">{{ createdCommunity.name }}</h2>
+            @if (!createdCommunity.isPublic) {
+              <p class="mb-2 text-sm text-gray-400">
+                This is a private community. Share this code with people you want to invite:
+              </p>
+              <div class="mb-4 rounded bg-black/40 px-3 py-2 text-center font-mono text-sm text-white">
+                {{ createdCommunity.accessCode }}
+              </div>
+            } @else {
+              <p class="mb-4 text-sm text-gray-400">Your community was created successfully.</p>
+            }
+            <button type="button" class="app-button-primary w-full" (click)="closeCreateModal()">
+              Done
+            </button>
           }
         </div>
       </div>
@@ -176,6 +287,17 @@ export class CommunitiesPageComponent implements OnInit {
   accessCode = '';
   codeError = '';
   foundCommunity: CommunityResponseDTO | null = null;
+
+  showCreateModal = false;
+  creating = false;
+  createError = '';
+  createForm: Omit<CommunityCreationDTO, 'isPublic'> = {
+    name: '',
+    description: '',
+    imgUrl: null,
+  };
+  createVisibility: '' | 'public' | 'private' = '';
+  createdCommunity: CommunityResponseDTO | null = null;
 
   toastMessage = '';
   private toastTimeout?: ReturnType<typeof setTimeout>;
@@ -245,6 +367,50 @@ export class CommunitiesPageComponent implements OnInit {
       },
       error: () => {
         this.codeError = 'Invalid Code.';
+      },
+    });
+  }
+
+  openCreateModal(): void {
+    this.showCreateModal = true;
+  }
+
+  closeCreateModal(): void {
+    this.showCreateModal = false;
+    this.createError = '';
+    this.creating = false;
+    this.createForm = { name: '', description: '', imgUrl: null };
+    this.createVisibility = '';
+    const wasCreated = !!this.createdCommunity;
+    this.createdCommunity = null;
+    if (wasCreated) {
+      this.loadCommunities();
+    }
+  }
+
+  submitCreate(): void {
+    if (!this.createForm.name.trim() || !this.createVisibility) return;
+    this.creating = true;
+    this.createError = '';
+
+    const dto: CommunityCreationDTO = {
+      name: this.createForm.name.trim(),
+      description: this.createForm.description?.trim(),
+      isPublic: this.createVisibility === 'public',
+      imgUrl: this.createForm.imgUrl?.trim() || null,
+    };
+
+    this.communitiesService.create(dto).subscribe({
+      next: (community) => {
+        this.creating = false;
+        this.createdCommunity = community;
+        if (community.isPublic) {
+          this.showToast(`Community ${community.name} created!`);
+        }
+      },
+      error: () => {
+        this.creating = false;
+        this.createError = 'Failed to create community.';
       },
     });
   }

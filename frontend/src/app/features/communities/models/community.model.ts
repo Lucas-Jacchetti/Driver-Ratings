@@ -14,8 +14,9 @@ export interface CommunityResponseDTO {
 
 export interface CommunityCreationDTO {
   name: string;
-  description: string | null;
+  description: string;
   isPublic: boolean;
+  imgUrl: string | null;
 }
 
 export interface CommunityMemberCreationDTO {

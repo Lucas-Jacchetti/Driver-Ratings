@@ -88,7 +88,7 @@ export class AppSidebarComponent {
   navItems: NavItem[] = [
     { label: 'Rate Drivers', path: '/', icon: 'star', exact: true },
     { label: 'Rankings', path: '/races', icon: 'trophy' },
-    { label: 'Community', path: '/communities', icon: 'users' },
+    { label: 'Communities', path: '/communities', icon: 'users' },
     { label: 'Profile', path: '/profile', icon: 'user' },
   ];
 
