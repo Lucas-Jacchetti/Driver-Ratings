@@ -91,4 +91,55 @@ public class CommunityService : ICommunityService
 
         return new PagedResult<Community>(items, totalCount, page, pageSize);
     }
+
+    public async Task<Result<Community?>> UpdateAsync(Guid userId, Guid communityId, CommunityUpdateRequest communityUpdateRequest)
+    {
+        
+        var community = await _dbContext.Communities
+            .Include(c => c.Host)
+            .Include(c => c.Members)
+                .ThenInclude(m => m.User)
+            .FirstOrDefaultAsync(c => c.Id == communityId);
+            
+        if (community is null)
+        {
+            return Result<Community?>.Failure("Community not found.");
+        }
+
+        if (userId != community.HostId)
+        {
+            return Result<Community?>.Failure("You must be the community host to edit this community.");
+        }
+
+        if (communityUpdateRequest.Name is not null)
+        {
+            community.Name = communityUpdateRequest.Name;
+        }
+
+        if (communityUpdateRequest.Description is not null)
+        {
+            community.Description = communityUpdateRequest.Description;
+        }
+
+        if (communityUpdateRequest.IsPublic is not null)
+        {
+            community.IsPublic = communityUpdateRequest.IsPublic.Value;
+            if (community.IsPublic)
+            {
+                community.AccessCode = null;
+            }
+            else
+            {
+                community.AccessCode = CommunityMapper.GenerateCode(false);
+            }
+        }
+
+        if (communityUpdateRequest.ImgUrl is not null)
+        {
+            community.ImgUrl = communityUpdateRequest.ImgUrl;
+        }
+
+        await _dbContext.SaveChangesAsync();
+        return Result<Community?>.Success(community!);
+    }
 }

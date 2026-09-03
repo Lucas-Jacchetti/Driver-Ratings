@@ -32,6 +32,13 @@ export interface CommunityMemberResponseDTO{
     joinedAt: string
 }
 
+export interface CommunityUpdateRequest{
+    name?: string,
+    description?: string,
+    isPublic?: boolean,
+    imgUrl?: string
+}
+
 export interface PagedResult<T> {
   items: T[];
   totalCount: number;

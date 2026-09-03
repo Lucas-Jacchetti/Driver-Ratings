@@ -57,11 +57,12 @@ public class CommunityMemberController : ControllerBase
         return CreatedAtAction(nameof(GetById), response);
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id)
+    [Authorize]
+    [HttpDelete("{communityId:guid}/members/me")]
+    public async Task<IActionResult> Leave(Guid communityId)
     {
-        var communityMember = await _service.DeleteAsync(id);
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var communityMember = await _service.LeaveAsync(communityId, userId);
 
         if (communityMember is null)
         {

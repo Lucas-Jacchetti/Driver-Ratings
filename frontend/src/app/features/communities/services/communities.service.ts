@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { CommunityCreationDTO, CommunityMemberCreationDTO, CommunityResponseDTO, PagedResult } from '../models/community.model';
+import { CommunityCreationDTO, CommunityMemberCreationDTO, CommunityResponseDTO, CommunityUpdateRequest, PagedResult } from '../models/community.model';
 
 @Injectable({ providedIn: 'root' })
 export class CommunitiesService {
@@ -20,8 +20,16 @@ export class CommunitiesService {
     return this.http.post<CommunityResponseDTO>(this.baseUrl, dto);
   }
 
+  update(communityId: string, request: CommunityUpdateRequest): Observable<CommunityResponseDTO> {
+    return this.http.patch<CommunityResponseDTO>(`${this.baseUrl}/${communityId}`, request);
+  }
+
   createMember(dto: CommunityMemberCreationDTO): Observable<void> {
     return this.http.post<void>(this.memberUrl, dto);
+  }
+
+  leave(communityId: string): Observable<void> {
+    return this.http.delete<void>(`${this.memberUrl}/${communityId}/members/me`);
   }
   
   getMy(): Observable<CommunityResponseDTO[]> {

@@ -1,5 +1,6 @@
 using backend.Domain.Common;
 using backend.Domain.Entities;
+using backend.Feature.Groups.Communities.DataManipulation;
 
 namespace backend.Domain.Interfaces;
 
@@ -11,5 +12,5 @@ public interface ICommunityService
     Task<Community?> DeleteAsync(Guid communityId);
     Task<Community?> GetByAccessCodeAsync(string accessCode);
     Task<PagedResult<Community>> GetMy(int page, int pageSize, Guid userId);
-
+    Task<Result<Community?>> UpdateAsync(Guid userId, Guid communityId, CommunityUpdateRequest communityUpdateRequest);
 }

@@ -93,6 +93,21 @@ public class CommunityController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
     }
 
+    [Authorize]
+    [HttpPatch("{communityId:guid}")]
+    public async Task<IActionResult> Update(Guid communityId, CommunityUpdateRequest request)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var updatedCommunity = await _service.UpdateAsync(userId, communityId, request);
+
+        if (updatedCommunity is null)
+        {
+            return NotFound();
+        }
+        var response = CommunityMapper.ToResponse(updatedCommunity.Value!);
+        return Ok(response);
+    }
+
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)

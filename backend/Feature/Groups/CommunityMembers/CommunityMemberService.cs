@@ -42,9 +42,11 @@ public class CommunityMemberService : ICommunityMemberService
         return Result<CommunityMember>.Success(created!);
     }
 
-    public async Task<CommunityMember?> DeleteAsync(Guid communityMemberId)
+    public async Task<CommunityMember?> LeaveAsync(Guid communityId, Guid userId)
     {
-        var communityMember = await _dbContext.CommunityMembers.FindAsync(communityMemberId);
+        var communityMember = await _dbContext.CommunityMembers
+            .FirstOrDefaultAsync(m => m.CommunityId == communityId && m.UserId == userId);
+
         if (communityMember is null)
         {
             return null;

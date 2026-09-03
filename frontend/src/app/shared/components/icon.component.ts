@@ -106,6 +106,10 @@ import { Component, Input } from '@angular/core';
         @case ('star') {
           <path d="M12 3.5 14.5 9l6 .6-4.5 4 1.3 5.9L12 16.6l-5.3 2.9L8 13.6l-4.5-4 6-.6L12 3.5Z" />
         }
+        @case ('copy') {
+          <rect x="9" y="9" width="12" height="12" rx="2" />
+          <path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1" />
+        }
       }
     </svg>
   `,

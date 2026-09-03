@@ -6,6 +6,7 @@ import { CommunitiesService } from '../../services/communities.service';
 import {
   CommunityResponseDTO,
   CommunityCreationDTO,
+  CommunityUpdateRequest,
   PagedResult,
 } from '../../models/community.model';
 import { Observable } from 'rxjs';
@@ -107,16 +108,29 @@ type ViewMode = 'All' | 'Mine';
                     {{ community.members.length }} members
                   }
                 </span>
-                @if (activeView === 'All') {
+                @if (isHost(community)) {
                   <button
                     type="button"
-                    class="px-4 py-1.5 text-xs"
-                    [class.app-button-primary]="!isMember(community)"
-                    [class.app-button-secondary]="isMember(community)"
-                    [disabled]="isMember(community)"
+                    class="app-button-secondary px-4 py-1.5 text-xs"
+                    (click)="openEditModal(community)"
+                  >
+                    Configure
+                  </button>
+                } @else if (isMember(community)) {
+                  <button
+                    type="button"
+                    class="app-button-secondary px-4 py-1.5 text-xs"
+                    (click)="leaveCommunity(community)"
+                  >
+                    Leave
+                  </button>
+                } @else if (activeView === 'All') {
+                  <button
+                    type="button"
+                    class="app-button-primary px-4 py-1.5 text-xs"
                     (click)="joinCommunity(community)"
                   >
-                    {{ isMember(community) ? 'Already In' : 'Join' }}
+                    Join
                   </button>
                 }
               </div>
@@ -173,7 +187,7 @@ type ViewMode = 'All' | 'Mine';
                   class="app-button-primary flex-1"
                   (click)="joinCommunity(foundCommunity, accessCode)"
                 >
-                  Enter
+                  Join
                 </button>
               </div>
             }
@@ -192,7 +206,7 @@ type ViewMode = 'All' | 'Mine';
             <label class="mb-1 block text-xs font-medium text-gray-400">Name</label>
             <input
               type="text"
-              class="app-input mb-3"
+              class="app-input mb-3 w-full"
               placeholder="Community name"
               [(ngModel)]="createForm.name"
               name="createName"
@@ -200,9 +214,9 @@ type ViewMode = 'All' | 'Mine';
 
             <label class="mb-1 block text-xs font-medium text-gray-400">Description</label>
             <textarea
-              class="app-input mb-3 resize-none"
+              class="app-input mb-3 w-full resize-none"
               rows="3"
-              placeholder="Description"
+              placeholder="Optional description"
               [(ngModel)]="createForm.description"
               name="createDescription"
             ></textarea>
@@ -265,6 +279,85 @@ type ViewMode = 'All' | 'Mine';
       </div>
     }
 
+    @if (showEditModal && editingCommunity) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" (click)="closeEditModal()">
+        <div class="w-full max-w-sm rounded-lg bg-[#141414] p-4 sm:p-6" (click)="$event.stopPropagation()">
+          <h2 class="mb-1 text-lg font-bold text-white">Configure Community</h2>
+          <p class="mb-4 text-sm text-gray-500">Configure {{ editingCommunity.name }}'s details.</p>
+
+          <label class="mb-1 block text-xs font-medium text-gray-400">Name</label>
+          <input
+            type="text"
+            class="app-input mb-3 w-full"
+            placeholder="Community name"
+            [(ngModel)]="editForm.name"
+            name="editName"
+          />
+
+          <label class="mb-1 block text-xs font-medium text-gray-400">Description</label>
+          <textarea
+            class="app-input mb-3 w-full resize-none"
+            rows="3"
+            placeholder="Optional description"
+            [(ngModel)]="editForm.description"
+            name="editDescription"
+          ></textarea>
+
+          <label class="mb-1 block text-xs font-medium text-gray-400">Image URL</label>
+          <input
+            type="text"
+            class="app-input mb-3 w-full"
+            placeholder="Optional image URL"
+            [(ngModel)]="editForm.imgUrl"
+            name="editImgUrl"
+          />
+
+          <label class="mb-1 block text-xs font-medium text-gray-400">Visibility</label>
+          <select
+            class="app-input mb-3 w-full"
+            [(ngModel)]="editVisibility"
+            name="editVisibility"
+          >
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
+
+          @if (editingCommunity.accessCode) {
+            <label class="mb-1 block text-xs font-medium text-gray-400">Access Code</label>
+            <div class="app-input mb-4 flex w-full items-center justify-between gap-2">
+              <span class="truncate font-mono">{{ editingCommunity.accessCode }}</span>
+              <button
+                type="button"
+                class="shrink-0 text-gray-400 hover:text-white"
+                (click)="copyAccessCode(editingCommunity.accessCode)"
+                title="Copy code"
+              >
+                <app-icon name="copy" [size]="15" />
+              </button>
+            </div>
+          }
+
+          @if (editError) {
+            <p class="mb-3 text-xs text-red-500">{{ editError }}</p>
+          }
+
+          <div class="flex gap-3">
+            <button type="button" class="app-button-secondary flex-1" (click)="closeEditModal()">
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="app-button-primary flex-1"
+              [disabled]="!editForm.name?.trim() || updating"
+              (click)="submitEdit()"
+            >
+              {{ updating ? 'Saving...' : 'Save' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
     @if (toastMessage) {
       <div class="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-green-600 px-5 py-3 text-sm font-medium text-white shadow-lg">
         {{ toastMessage }}
@@ -298,6 +391,13 @@ export class CommunitiesPageComponent implements OnInit {
   };
   createVisibility: '' | 'public' | 'private' = '';
   createdCommunity: CommunityResponseDTO | null = null;
+
+  showEditModal = false;
+  updating = false;
+  editError = '';
+  editingCommunity: CommunityResponseDTO | null = null;
+  editForm: CommunityUpdateRequest = {};
+  editVisibility: 'public' | 'private' = 'public';
 
   toastMessage = '';
   private toastTimeout?: ReturnType<typeof setTimeout>;
@@ -335,6 +435,12 @@ export class CommunitiesPageComponent implements OnInit {
     return community.members.some((m) => m.user.id === userId);
   }
 
+  isHost(community: CommunityResponseDTO): boolean {
+    const userId = this.authService.currentUser()?.id;
+    if (!userId) return false;
+    return community.host.id === userId;
+  }
+
   joinCommunity(community: CommunityResponseDTO, accessToken?: string): void {
     this.communitiesService.createMember({ communityId: community.id, accessToken }).subscribe({
       next: () => {
@@ -344,6 +450,18 @@ export class CommunitiesPageComponent implements OnInit {
       },
       error: () => {
         this.codeError = 'Failed to join community.';
+      },
+    });
+  }
+
+  leaveCommunity(community: CommunityResponseDTO): void {
+    this.communitiesService.leave(community.id).subscribe({
+      next: () => {
+        this.showToast(`You left ${community.name}.`);
+        this.loadCommunities();
+      },
+      error: () => {
+        this.showToast('Failed to leave community.');
       },
     });
   }
@@ -412,6 +530,59 @@ export class CommunitiesPageComponent implements OnInit {
         this.creating = false;
         this.createError = 'Failed to create community.';
       },
+    });
+  }
+
+  openEditModal(community: CommunityResponseDTO): void {
+    this.editingCommunity = community;
+    this.editForm = {
+      name: community.name,
+      description: community.description ?? '',
+      imgUrl: community.imgUrl ?? '',
+    };
+    this.editVisibility = community.isPublic ? 'public' : 'private';
+    this.editError = '';
+    this.showEditModal = true;
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+    this.updating = false;
+    this.editError = '';
+    this.editingCommunity = null;
+    this.editForm = {};
+  }
+
+  submitEdit(): void {
+    if (!this.editingCommunity || !this.editForm.name?.trim()) return;
+    this.updating = true;
+    this.editError = '';
+
+    const request: CommunityUpdateRequest = {
+      name: this.editForm.name.trim(),
+      description: this.editForm.description?.trim() || undefined,
+      imgUrl: this.editForm.imgUrl?.trim() || undefined,
+      isPublic: this.editVisibility === 'public',
+    };
+
+    this.communitiesService.update(this.editingCommunity.id, request).subscribe({
+      next: (community) => {
+        this.updating = false;
+        this.showToast(`Community ${community.name} updated!`);
+        this.closeEditModal();
+        this.loadCommunities();
+      },
+      error: () => {
+        this.updating = false;
+        this.editError = 'Failed to update community.';
+      },
+    });
+  }
+
+  copyAccessCode(code: string | null): void {
+    if (!code) return;
+    navigator.clipboard.writeText(code).then(() => {
+      this.showToast('Access code copied!');
     });
   }
 
