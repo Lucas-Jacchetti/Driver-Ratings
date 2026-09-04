@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../../../shared/components/icon.component';
+import { RacesPageComponent } from '../../../races/pages/races-page/races-page.component';
 import { CommunitiesService } from '../../services/communities.service';
 import {
   CommunityResponseDTO,
@@ -17,8 +18,14 @@ type ViewMode = 'All' | 'Mine';
 @Component({
   selector: 'app-communities-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [CommonModule, FormsModule, IconComponent, RacesPageComponent],
   template: `
+    @if (selectedCommunity) {
+      <app-races-page
+        [communityId]="selectedCommunity.id"
+        (back)="selectedCommunity = null"
+      />
+    } @else {
     <div class="mb-5 flex items-start justify-between gap-4">
       <div>
         <h1 class="text-xl font-bold text-white">Communities</h1>
@@ -74,7 +81,12 @@ type ViewMode = 'All' | 'Mine';
     } @else {
       <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
         @for (community of filteredCommunities; track community.id) {
-          <div class="overflow-hidden rounded-lg border border-gray-800 bg-[#141414]">
+          <div
+            class="overflow-hidden rounded-lg border border-gray-800 bg-[#141414] transition-colors"
+            [class.cursor-pointer]="canOpenRatings(community)"
+            [class.hover:border-gray-700]="canOpenRatings(community)"
+            (click)="onCardClick(community)"
+          >
             @if (community.imgUrl) {
               <div class="relative h-32">
                 <img
@@ -99,7 +111,7 @@ type ViewMode = 'All' | 'Mine';
               <p class="mb-3 line-clamp-2 text-sm text-gray-400">
                 {{ community.description }}
               </p>
-              <div class="flex items-center justify-between">
+              <div class="flex items-center justify-between" (click)="$event.stopPropagation()">
                 <span class="flex items-center gap-1.5 text-xs text-gray-500">
                   <app-icon name="users" [size]="14" />
                   @if(community.members.length === 1) {
@@ -363,6 +375,7 @@ type ViewMode = 'All' | 'Mine';
         {{ toastMessage }}
       </div>
     }
+    }
   `,
 })
 export class CommunitiesPageComponent implements OnInit {
@@ -398,6 +411,8 @@ export class CommunitiesPageComponent implements OnInit {
   editingCommunity: CommunityResponseDTO | null = null;
   editForm: CommunityUpdateRequest = {};
   editVisibility: 'public' | 'private' = 'public';
+
+  selectedCommunity: CommunityResponseDTO | null = null;
 
   toastMessage = '';
   private toastTimeout?: ReturnType<typeof setTimeout>;
@@ -439,6 +454,15 @@ export class CommunitiesPageComponent implements OnInit {
     const userId = this.authService.currentUser()?.id;
     if (!userId) return false;
     return community.host.id === userId;
+  }
+
+  canOpenRatings(community: CommunityResponseDTO): boolean {
+    return this.isMember(community) || this.isHost(community);
+  }
+
+  onCardClick(community: CommunityResponseDTO): void {
+    if (!this.canOpenRatings(community)) return;
+    this.selectedCommunity = community;
   }
 
   joinCommunity(community: CommunityResponseDTO, accessToken?: string): void {

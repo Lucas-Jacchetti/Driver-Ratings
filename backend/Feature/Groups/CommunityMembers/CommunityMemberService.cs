@@ -74,7 +74,15 @@ public class CommunityMemberService : ICommunityMemberService
 
     public async Task<bool> IsMemberAsync(Guid communityId, Guid userId)
     {
-        return await _dbContext.CommunityMembers
+        var isExplicitMember = await _dbContext.CommunityMembers
             .AnyAsync(cm => cm.CommunityId == communityId && cm.UserId == userId);
+
+        if (isExplicitMember)
+        {
+            return true;
+        }
+
+        return await _dbContext.Communities
+            .AnyAsync(c => c.Id == communityId && c.HostId == userId);
     }
 }

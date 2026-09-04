@@ -33,7 +33,7 @@ export class RatingsService {
     );
   }
 
-  getUserRatings(year: number,raceId?: string): Observable<DriverSeasonRating[]> {
+  getUserRatings(year: number, raceId?: string): Observable<DriverSeasonRating[]> {
     let params = new HttpParams().set('year', year);
 
     if (raceId) {
@@ -45,4 +45,18 @@ export class RatingsService {
       { params }
     );
   }
+
+  getCommunityRatings(year: number, communityId: string, raceId?: string): Observable<DriverSeasonRating[]> {
+    let params = new HttpParams().set('year', year);
+
+    if (raceId) {
+      params = params.set('raceId', raceId);
+    }
+
+    return this.http.get<DriverSeasonRating[]>(
+      `${this.baseUrl}/community/${communityId}`,
+      { params }
+    );
+  }
+
 }
