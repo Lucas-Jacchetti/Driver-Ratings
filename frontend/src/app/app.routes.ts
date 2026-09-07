@@ -19,27 +19,6 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'races/:id',
-    loadComponent: () =>
-      import('./features/races/pages/race-detail-page/race-detail-page.component').then(
-        (m) => m.RaceDetailPageComponent
-      ),
-  },
-  {
-    path: 'races/:id/rate',
-    loadComponent: () =>
-      import('./features/ratings/pages/rate-race-page/rate-race-page.component').then(
-        (m) => m.RateRacePageComponent
-      ),
-  },
-  {
-    path: 'drivers',
-    loadComponent: () =>
-      import('./features/drivers/pages/drivers-page/drivers-page.component').then(
-        (m) => m.DriversPageComponent
-      ),
-  },
-  {
     path: 'communities',
     loadComponent: () =>
       import('./features/communities/pages/communities-page/communities-page.component').then(

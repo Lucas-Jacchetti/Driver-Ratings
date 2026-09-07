@@ -61,7 +61,17 @@ function teamOrderIndex(teamName: string): number {
         <div class="mb-6 flex flex-col gap-4 rounded-lg border border-gray-800 bg-[#141414] p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-red-500">Current race</p>
-            <h1 class="text-xl font-bold text-white">{{ r.name }}</h1>
+            <div class="flex lex-row gap-2">
+              <h1 class="text-xl font-bold text-white">{{ r.name }}</h1>
+              <div class="flex h-6 w-8 shrink-0 items-center justify-center sm:h-5 sm:w-8 md:h-7 md:w-9">
+                <img
+                  [src]="flagUrl(r.flag)"
+                  alt=""
+                  class="h-full w-full object-contain"
+                  onerror="this.style.display='none'"
+                />
+              </div>
+            </div>
             <p class="mt-1 text-sm text-gray-400">{{ r.circuit }}</p>
           </div>
 
@@ -346,6 +356,10 @@ export class HomePageComponent implements OnInit {
   startEditing(): void {
     this.editing.set(true);
     this.feedback.set(null);
+  }
+
+  flagUrl(countryCode: string): string {
+    return `https://flagcdn.com/${countryCode.toLowerCase()}.svg`;
   }
 
   cancelEditing(): void {
