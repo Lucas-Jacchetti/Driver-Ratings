@@ -30,6 +30,17 @@ public class CommunityMemberService : ICommunityMemberService
         }
 
         var community = await _dbContext.Communities.FindAsync(communityMember.CommunityId);
+
+        if (communityMember.UserId == community!.HostId)
+        {
+            return Result<CommunityMember>.Failure("Host cannot join their own community.");
+        }
+
+        if(await _dbContext.CommunityMembers.AnyAsync(cm => cm.CommunityId == communityMember.CommunityId && cm.UserId == communityMember.UserId))
+        {
+            return Result<CommunityMember>.Failure("User is already a member of this community.");
+        }
+        
         if (!community!.IsPublic && community.AccessCode != accessToken)
         {
             return Result<CommunityMember>.Failure("Incorrect access code.");

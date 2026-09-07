@@ -22,11 +22,20 @@ public static class RatingMapper
     public static RatingSummaryDTO ToSummary(Rating rating) =>
         new(rating.Id, UserMapper.ToSummary(rating.User), rating.Score.Value, rating.RatedAt);
 
-    public static Rating ToDomain(RatingCreationDTO ratingCreationDTO, Guid userId) =>
-        new()
+    public static bool TryToDomain(RatingCreationDTO dto, Guid userId, out Rating? rating, out string? error)
+    {
+        if (!Score.TryCreate(dto.Score, out var score, out error))
+        {
+            rating = null;
+            return false;
+        }
+
+        rating = new Rating
         {
             UserId = userId,
-            DriverRaceResultId = ratingCreationDTO.DriverRaceResultId,
-            Score = Score.Create(ratingCreationDTO.Score),
+            DriverRaceResultId = dto.DriverRaceResultId,
+            Score = score!,
         };
+        return true;
+    }
 }

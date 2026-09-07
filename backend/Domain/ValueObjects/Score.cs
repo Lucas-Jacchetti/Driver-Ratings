@@ -18,11 +18,25 @@ public class Score
 
     public static Score Create(decimal value)
     {
+        if (!TryCreate(value, out var score, out var error))
+        {
+            throw new ArgumentOutOfRangeException(nameof(value), error);
+        }
+        return score!;
+    }
+
+    public static bool TryCreate(decimal value, out Score? score, out string? error)
+    {
         if (value < Minimum || value > Maximum)
         {
-            throw new ArgumentOutOfRangeException(nameof(value), $"Score must be between {Minimum} and {Maximum}.");
+            score = null;
+            error = $"Score must be between {Minimum} and {Maximum}.";
+            return false;
         }
-        return new Score(value);
+
+        score = new Score(value);
+        error = null;
+        return true;
     }
 
     public override string ToString() => Value.ToString("0.0");

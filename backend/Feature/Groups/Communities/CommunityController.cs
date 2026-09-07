@@ -3,6 +3,7 @@ using backend.Domain.Interfaces;
 using backend.Feature.Groups.Communities.DataManipulation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace backend.Feature.Groups.Communities;
 
@@ -63,6 +64,7 @@ public class CommunityController : ControllerBase
     }
 
     [Authorize]
+    [EnableRateLimiting("community-join")]
     [HttpGet("by-code/{accessCode}")]
     public async Task<IActionResult> GetByAccessCode(string accessCode)
     {
@@ -100,10 +102,11 @@ public class CommunityController : ControllerBase
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var updatedCommunity = await _service.UpdateAsync(userId, communityId, request);
 
-        if (updatedCommunity is null)
+        if (!updatedCommunity.IsSuccess)
         {
-            return NotFound();
+            return BadRequest(new { error = updatedCommunity.Error });
         }
+        
         var response = CommunityMapper.ToResponse(updatedCommunity.Value!);
         return Ok(response);
     }

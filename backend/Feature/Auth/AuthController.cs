@@ -2,6 +2,7 @@ using backend.Domain.Interfaces;
 using backend.Feature.Auth.DataManipulation;
 using backend.Feature.Users.DataManipulation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace backend.Feature.Auth;
 
@@ -16,6 +17,7 @@ public class AuthController : ControllerBase
         _service = service;
     }
 
+    [EnableRateLimiting("google-login")]
     [HttpPost("google")]
     public async Task<IActionResult> LoginWithGoogle(GoogleLoginRequest request)
     {

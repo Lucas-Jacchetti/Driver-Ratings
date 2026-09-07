@@ -3,6 +3,7 @@ using backend.Domain.Interfaces;
 using backend.Feature.Groups.CommunityMembers.DataManipulation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace backend.Feature.Groups.CommunityMembers;
 
@@ -40,6 +41,7 @@ public class CommunityMemberController : ControllerBase
     }
 
     [Authorize]
+    [EnableRateLimiting("community-join")]
     [HttpPost]
     public async Task<IActionResult> Create(CommunityMemberCreationDTO request)
     {
@@ -54,7 +56,7 @@ public class CommunityMemberController : ControllerBase
         }
 
         var response = CommunityMemberMapper.ToResponse(result.Value!);
-        return CreatedAtAction(nameof(GetById), response);
+         return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
     }
 
     [Authorize]

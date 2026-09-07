@@ -64,6 +64,7 @@ public class CommunityService : ICommunityService
     public async Task<Community?> GetByIdAsync(Guid id)
     {
         return await _dbContext.Communities
+            .Where(c => c.IsPublic)
             .IncludeForMapping()
             .FirstOrDefaultAsync(r => r.Id == id);
     }

@@ -50,8 +50,12 @@ public class RatingController : ControllerBase
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var rating = RatingMapper.ToDomain(request, userId);
-        var result = await _service.CreateAsync(rating);
+        if (!RatingMapper.TryToDomain(request, userId, out var rating, out var validationError))
+        {
+            return BadRequest(new { error = validationError });
+        }
+
+        var result = await _service.CreateAsync(rating!);
 
         if (!result.IsSuccess)
         {
@@ -68,13 +72,21 @@ public class RatingController : ControllerBase
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var ratings = request.Ratings
-            .Select(r => new Rating{
+        var ratings = new List<Rating>();
+        foreach (var r in request.Ratings)
+        {
+            if (!Score.TryCreate(r.Score, out var score, out var scoreError))
+            {
+                return BadRequest(new { error = $"Invalid score for driver race result {r.DriverRaceResultId}: {scoreError}" });
+            }
+
+            ratings.Add(new Rating
+            {
                 UserId = userId,
                 DriverRaceResultId = r.DriverRaceResultId,
-                Score = Score.Create(r.Score)
-            })
-            .ToList();
+                Score = score!
+            });
+        }
 
         var submission = new RaceRatingSubmission
         {
@@ -103,13 +115,21 @@ public class RatingController : ControllerBase
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var ratings = request.Ratings
-            .Select(r => new Rating{
+        var ratings = new List<Rating>();
+        foreach (var r in request.Ratings)
+        {
+            if (!Score.TryCreate(r.Score, out var score, out var scoreError))
+            {
+                return BadRequest(new { error = $"Invalid score for driver race result {r.DriverRaceResultId}: {scoreError}" });
+            }
+
+            ratings.Add(new Rating
+            {
                 UserId = userId,
                 DriverRaceResultId = r.DriverRaceResultId,
-                Score = Score.Create(r.Score)
-            })
-            .ToList();
+                Score = score!
+            });
+        }
 
         var submission = new RaceRatingSubmission
         {
