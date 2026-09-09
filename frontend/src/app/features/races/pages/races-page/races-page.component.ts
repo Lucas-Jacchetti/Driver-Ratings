@@ -37,6 +37,8 @@ interface DisplayResult {
   context?: string;
   startingPosition?: number;
   finishingPosition?: number;
+  startingPositionSprint?: number;
+  finishingPositionSprint?: number;
 }
 
 @Component({
@@ -194,15 +196,59 @@ interface DisplayResult {
                   </div>
 
                   @if (item.startingPosition !== undefined) {
-                    <div class="flex shrink-0 items-center gap-3">
-                      <div class="text-center">
-                        <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">Started</div>
-                        <div class="text-lg font-black text-gray-300">P{{ item.startingPosition }}</div>
-                      </div>
+                    <div
+                      class="flex flex-col justify-center"
+                      [class.gap-1]="isSprintRace()"
+                      [class.gap-4]="!isSprintRace()"
+                    >
+                      @if (isSprintRace()) {
+                        <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+                          <div class="text-center">
+                            <div class="mb-0.5 text-[9px] uppercase tracking-[0.15em] text-white/40">Sprint Start</div>
+                            <div
+                              class="font-bold text-gray-400"
+                              [class.text-xs]="true"
+                              [class.sm:text-sm]="true"
+                            >
+                              P{{ item.startingPositionSprint }}
+                            </div>
+                          </div>
 
-                      <div class="text-center">
-                        <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">Finished</div>
-                        <div class="text-lg font-black text-white">{{ finishLabel(item.finishingPosition!) }}</div>
+                          <div class="text-center">
+                            <div class="mb-0.5 text-[9px] uppercase tracking-[0.15em] text-white/40">Sprint Fin.</div>
+                            <div
+                              class="font-bold text-gray-300"
+                              [class.text-xs]="true"
+                              [class.sm:text-sm]="true"
+                            >
+                              {{ finishLabel(item.finishingPositionSprint!) }}
+                            </div>
+                          </div>
+                        </div>
+                      }
+
+                      <div class="flex shrink-0 items-center gap-3">
+                        <div class="text-center">
+                          <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">Started</div>
+                          <div
+                            class="font-black text-gray-300"
+                            [class.text-base]="isSprintRace()"
+                            [class.text-lg]="!isSprintRace()"
+                          >
+                            P{{ item.startingPosition }}
+                          </div>
+                        </div>
+
+                        <div class="text-center">
+                          <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">Finished</div>
+                          <div
+                            class="font-black text-white"
+                            [class.text-base]="isSprintRace()"
+                            [class.text-lg]="!isSprintRace()"
+                          >
+                            {{ finishLabel(item.finishingPosition!) }}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   }
@@ -260,7 +306,8 @@ export class RacesPageComponent implements OnInit {
 
   contextOpen: Record<string, boolean> = {};
 
-  isSeasonView = computed(() => this.raceView() === null);   
+  isSeasonView = computed(() => this.raceView() === null);
+  isSprintRace = computed(() => this.raceView()?.isSprint ?? false);
 
   displayResults = computed<DisplayResult[]>(() => {
     if (this.isSeasonView()) {
@@ -294,6 +341,8 @@ export class RacesPageComponent implements OnInit {
         context: result.context,
         startingPosition: result.startingPosition,
         finishingPosition: result.finishingPosition,
+        startingPositionSprint: race.isSprint ? result.startingPositionSprint : undefined,
+        finishingPositionSprint: race.isSprint ? result.finishingPositionSprint : undefined,
       }));
   });
 

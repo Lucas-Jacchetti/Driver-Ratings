@@ -12,5 +12,7 @@ public class Race
     public Guid SeasonId { get; set; }
     public Season Season { get; set; } = null!;
 
+    public bool IsSprint { get; set; }
+
     public ICollection<DriverRaceResult> DriverRaceResults { get; set; } = [];
 }

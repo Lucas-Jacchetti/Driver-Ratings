@@ -1,5 +1,4 @@
 using backend.Data;
-using backend.Domain.Common;
 using backend.Domain.Entities;
 using backend.Domain.Interfaces;
 using backend.Feature.Races.DataManipulation;
@@ -38,6 +37,8 @@ public class RaceService : IRaceService
                 RaceId = race.Id,
                 StartingPosition = 0,
                 FinishingPosition = 0,
+                StartingPositionSprint = 0,
+                FinishingPositionSprint = 0,
                 Context = string.Empty
             });
         }

@@ -9,5 +9,7 @@ public record DriverRaceResultSummaryDTO(
     RaceSummaryDTO Race,
     int StartingPosition,
     int FinishingPosition,
+    int StartingPositionSprint,
+    int FinishingPositionSprint,
     string Context
 );

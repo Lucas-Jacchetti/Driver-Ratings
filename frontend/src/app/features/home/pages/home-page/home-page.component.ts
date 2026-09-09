@@ -152,29 +152,51 @@ function teamOrderIndex(teamName: string): number {
                       }
                     </div>
                   </div>
+                  
+                  <div class="flex flex-col gap-4">
+                    <div class="flex shrink-0 items-center gap-3">
+                      <div class="text-center">
+                        <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">
+                          Started (Sprint)
+                        </div>
 
-                  <div class="flex shrink-0 items-center gap-3">
-                    <div class="text-center">
-                      <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">
-                        Started
+                        <div class="text-lg font-black text-gray-300">
+                          P{{ result.startingPositionSprint }}
+                        </div>
                       </div>
 
-                      <div class="text-lg font-black text-gray-300">
-                        P{{ result.startingPosition }}
+                      <div class="text-center">
+                        <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">
+                          Finished (Sprint)
+                        </div>
+
+                        <div class="text-lg font-black text-white">
+                          {{ finishLabel(result.finishingPositionSprint) }}
+                        </div>
                       </div>
                     </div>
+                    <div class="flex shrink-0 items-center gap-3">
+                      <div class="text-center">
+                        <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">
+                          Started
+                        </div>
 
-                    <div class="text-center">
-                      <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">
-                        Finished
+                        <div class="text-lg font-black text-gray-300">
+                          P{{ result.startingPosition }}
+                        </div>
                       </div>
 
-                      <div class="text-lg font-black text-white">
-                        {{ finishLabel(result.finishingPosition) }}
+                      <div class="text-center">
+                        <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">
+                          Finished
+                        </div>
+
+                        <div class="text-lg font-black text-white">
+                          {{ finishLabel(result.finishingPosition) }}
+                        </div>
                       </div>
                     </div>
                   </div>
-
                   <div class="flex min-w-[220px] flex-1 items-center gap-4">
                     <input
                       type="range"

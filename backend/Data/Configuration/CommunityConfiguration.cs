@@ -12,7 +12,6 @@ public class CommunityConfiguration : IEntityTypeConfiguration<Community>
         builder.Property(c => c.ImgUrl).HasMaxLength(500);
         builder.Property(c => c.AccessCode).HasMaxLength(20);
 
-        // Único apenas entre comunidades privadas -- públicas não usam código.
         builder.HasIndex(c => c.AccessCode)
             .IsUnique()
             .HasFilter("\"AccessCode\" IS NOT NULL");

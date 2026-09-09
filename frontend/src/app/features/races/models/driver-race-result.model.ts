@@ -8,6 +8,8 @@ export interface DriverRaceResultSummaryDTO {
   race: RaceSummaryDTO;
   startingPosition: number;
   finishingPosition: number; // 0 = DNF/DNS
+  startingPositionSprint: number;
+  finishingPositionSprint: number;
   context: string;
 }
 
@@ -20,6 +22,8 @@ export interface DriverRaceResultCreationDTO {
   raceId: string;
   startingPosition: number;
   finishingPosition: number;
+  startingPositionSprint: number;
+  finishingPositionSprint: number;
   context: string;
 }
 
@@ -27,6 +31,8 @@ export interface DriverRaceResultUpdateDTO {
   driverRaceResultId: string;
   startingPosition: number;
   finishingPosition: number;
+  startingPositionSprint: number;
+  finishingPositionSprint: number;
   context: string;
 }
 

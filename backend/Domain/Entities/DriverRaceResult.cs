@@ -12,6 +12,8 @@ public class DriverRaceResult
 
     public required int StartingPosition { get; set; }
     public required int FinishingPosition { get; set; }   // 0 = DNF/DNS
+    public required int StartingPositionSprint { get; set; }
+    public required int FinishingPositionSprint { get; set; }   // 0 = DNF/DNS
     public required string Context { get; set; }
 
     public ICollection<Rating> Ratings { get; set; } = [];

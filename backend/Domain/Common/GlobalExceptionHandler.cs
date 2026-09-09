@@ -19,7 +19,6 @@ public class GlobalExceptionHandler : IExceptionHandler
     {
         var (statusCode, message) = MapException(exception);
 
-        // Loga sempre a exceção real; só a mensagem "amigável" vai pro cliente.
         _logger.LogError(exception, "Unhandled exception on {Path}", httpContext.Request.Path);
 
         httpContext.Response.StatusCode = statusCode;

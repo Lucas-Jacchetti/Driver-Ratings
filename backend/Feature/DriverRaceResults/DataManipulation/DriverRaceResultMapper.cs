@@ -14,6 +14,8 @@ public static class DriverRaceResultMapper
             RaceMapper.ToSummary(result.Race),
             result.StartingPosition,
             result.FinishingPosition,
+            result.StartingPositionSprint,
+            result.FinishingPositionSprint,
             result.Context,
             result.Ratings.Select(RatingMapper.ToSummary).ToList()
         );
@@ -25,6 +27,8 @@ public static class DriverRaceResultMapper
             RaceMapper.ToSummary(result.Race),
             result.StartingPosition,
             result.FinishingPosition,
+            result.StartingPositionSprint,
+            result.FinishingPositionSprint,
             result.Context
         );
 
@@ -35,6 +39,8 @@ public static class DriverRaceResultMapper
             RaceId = driverRaceResultCreationDTO.RaceId,
             StartingPosition = driverRaceResultCreationDTO.StartingPosition,
             FinishingPosition = driverRaceResultCreationDTO.FinishingPosition,
+            StartingPositionSprint = driverRaceResultCreationDTO.StartingPositionSprint,
+            FinishingPositionSprint = driverRaceResultCreationDTO.FinishingPositionSprint,
             Context = driverRaceResultCreationDTO.Context
         };
 }

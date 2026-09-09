@@ -5,5 +5,6 @@ public record RaceCreationDTO(
     string Circuit,
     string Flag,
     DateTime Date,
-    Guid SeasonId
+    Guid SeasonId,
+    bool IsSprint
 );

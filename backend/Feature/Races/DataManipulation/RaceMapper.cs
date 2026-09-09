@@ -14,12 +14,13 @@ public static class RaceMapper
             race.Flag,
             race.Date.ToString("dd/MM/yyyy"),
             SeasonMapper.ToSummary(race.Season),
-            race.DriverRaceResults.Select(DriverRaceResultMapper.ToSummary).ToList()
+            race.DriverRaceResults.Select(DriverRaceResultMapper.ToSummary).ToList(),
+            race.IsSprint
         );
 
     public static RaceSummaryDTO ToSummary(Race race) =>
-        new(race.Id, race.Name, race.Circuit, race.Flag, race.Date);
+        new(race.Id, race.Name, race.Circuit, race.Flag, race.Date, race.IsSprint);
 
     public static Race ToDomain(RaceCreationDTO raceCreationDTO) =>
-        new() { Name = raceCreationDTO.Name, Circuit = raceCreationDTO.Circuit, Flag = raceCreationDTO.Flag, Date = DateTime.SpecifyKind(raceCreationDTO.Date, DateTimeKind.Utc), SeasonId = raceCreationDTO.SeasonId };
+        new() { Name = raceCreationDTO.Name, Circuit = raceCreationDTO.Circuit, Flag = raceCreationDTO.Flag, Date = DateTime.SpecifyKind(raceCreationDTO.Date, DateTimeKind.Utc), SeasonId = raceCreationDTO.SeasonId, IsSprint = raceCreationDTO.IsSprint };
 }

@@ -285,6 +285,8 @@ export class AdminRaceResultsPageComponent implements OnInit {
         driverRaceResultId: result.id,
         startingPosition: result.startingPosition,
         finishingPosition: result.finishingPosition,
+        startingPositionSprint: result.startingPositionSprint,
+        finishingPositionSprint: result.finishingPositionSprint,
         context: result.context ?? '',
       })),
     };

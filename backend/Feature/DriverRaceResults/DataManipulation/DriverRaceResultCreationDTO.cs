@@ -5,5 +5,7 @@ public record DriverRaceResultCreationDTO(
     Guid RaceId,
     int StartingPosition,
     int FinishingPosition,
+    int StartingPositionSprint,
+    int FinishingPositionSprint,
     string Context
 );

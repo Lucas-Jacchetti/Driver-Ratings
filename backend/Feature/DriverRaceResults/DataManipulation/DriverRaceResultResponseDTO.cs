@@ -10,6 +10,8 @@ public record DriverRaceResultResponseDTO(
     RaceSummaryDTO Race,
     int StartingPosition,
     int FinishingPosition,
+    int StartingPositionSprint,
+    int FinishingPositionSprint,
     string Context,
     ICollection<RatingSummaryDTO> Ratings
 );

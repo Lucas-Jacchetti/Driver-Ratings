@@ -19,7 +19,7 @@ public class AuthController : ControllerBase
         _service = service;
     }
 
-    //[EnableRateLimiting("google-login")]
+    [EnableRateLimiting("google-login")]
     [HttpPost("google")]
     public async Task<IActionResult> LoginWithGoogle(GoogleLoginRequest request)
     {

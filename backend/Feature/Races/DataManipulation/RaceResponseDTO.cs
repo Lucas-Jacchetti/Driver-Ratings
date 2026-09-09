@@ -9,5 +9,6 @@ public record RaceResponseDTO(
     string Flag,
     string Date,
     SeasonSummaryDTO Season,
-    ICollection<DriverRaceResultSummaryDTO> DriverRaceResults
+    ICollection<DriverRaceResultSummaryDTO> DriverRaceResults,
+    bool IsSprint
 );

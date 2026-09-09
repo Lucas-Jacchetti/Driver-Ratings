@@ -7,6 +7,7 @@ export interface RaceSummaryDTO {
   circuit: string;
   flag: string;
   date: string;
+  isSprint: boolean;
 }
 
 export interface RaceResponseDTO {
@@ -17,6 +18,7 @@ export interface RaceResponseDTO {
   date: string;
   season: SeasonSummaryDTO;
   driverRaceResults: DriverRaceResultSummaryDTO[];
+  isSprint: boolean;
 }
 
 export interface RaceCreationDTO {
@@ -25,4 +27,5 @@ export interface RaceCreationDTO {
   flag: string;
   date: string;
   seasonId: string;
+  isSprint: boolean;
 }

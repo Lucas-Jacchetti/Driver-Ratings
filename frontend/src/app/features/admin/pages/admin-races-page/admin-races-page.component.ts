@@ -14,6 +14,7 @@ interface RaceForm {
   circuit: string;
   flag: string;
   date: string;
+  isSprint: boolean;
 }
 
 @Component({
@@ -66,6 +67,16 @@ interface RaceForm {
             required
           />
         </div>
+        <div class="flex items-center gap-2 pb-2.5">
+          <input
+            type="checkbox"
+            id="isSprint"
+            class="h-4 w-4 shrink-0 cursor-pointer appearance-none rounded border border-gray-700 bg-[#141414] checked:border-red-600 checked:bg-red-600 focus:outline-none focus:ring-1 focus:ring-red-600 focus:ring-offset-0"
+            [(ngModel)]="form.isSprint"
+            name="isSprint"
+          />
+          <label for="isSprint" class="text-xs uppercase tracking-wide text-gray-500">Sprint</label>
+        </div>
         <button type="submit" class="app-button-primary px-4 py-2" [disabled]="creating()">
           <app-icon name="plus" [size]="15" />
           Add
@@ -92,7 +103,14 @@ interface RaceForm {
                   />
                 </div>
                 <div>
-                  <p class="text-sm text-gray-200">{{ race.name }}</p>
+                  <div class="flex items-center gap-2">
+                    <p class="text-sm text-gray-200">{{ race.name }}</p>
+                    @if (race.isSprint) {
+                      <span class="rounded bg-red-950/40 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-red-400">
+                        Sprint
+                      </span>
+                    }
+                  </div>
                   <p class="text-xs text-gray-500">{{ race.circuit }} · {{ formatDate(race.date) }}</p>
                 </div>
               </div>
@@ -123,7 +141,7 @@ export class AdminRacesPageComponent implements OnInit {
   errorMessage = signal('');
 
   selectedSeasonId = '';
-  form: RaceForm = { name: '', circuit: '', flag: '', date: '' };
+  form: RaceForm = { name: '', circuit: '', flag: '', date: '', isSprint: false };
 
   ngOnInit(): void {
     this.seasonsService.getAll().subscribe({
@@ -169,6 +187,7 @@ export class AdminRacesPageComponent implements OnInit {
       flag: this.form.flag.toLowerCase(),
       date: `${this.form.date}:00Z`,
       seasonId: this.selectedSeasonId,
+      isSprint: this.form.isSprint,
     };
 
     this.creating.set(true);
@@ -176,7 +195,7 @@ export class AdminRacesPageComponent implements OnInit {
 
     this.racesService.create(dto).subscribe({
       next: () => {
-        this.form = { name: '', circuit: '', flag: '', date: '' };
+        this.form = { name: '', circuit: '', flag: '', date: '', isSprint: false };
         this.creating.set(false);
         this.loadRaces();
       },

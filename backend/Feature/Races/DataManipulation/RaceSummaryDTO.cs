@@ -5,5 +5,6 @@ public record RaceSummaryDTO(
     string Name, 
     string Circuit, 
     string Flag,
-    DateTime Date
+    DateTime Date,
+    bool IsSprint
 );

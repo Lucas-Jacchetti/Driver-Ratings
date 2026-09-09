@@ -48,6 +48,8 @@ public class DriverRaceResultService : IDriverRaceResultService
 
                 driverRaceResult.StartingPosition = result.StartingPosition;
                 driverRaceResult.FinishingPosition = result.FinishingPosition;
+                driverRaceResult.StartingPositionSprint = result.StartingPositionSprint;
+                driverRaceResult.FinishingPositionSprint = result.FinishingPositionSprint;
                 driverRaceResult.Context = result.Context;
             }
 
