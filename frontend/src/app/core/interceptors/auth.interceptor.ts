@@ -1,18 +1,21 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { AuthService } from '../../features/auth/services/auth.service';
+
+const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
+
+function readCookie(name: string): string | null {
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : null;
+}
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthService);
-  const token = authService.getToken();
+  let authReq = req.clone({ withCredentials: true });
 
-  if (!token) {
-    return next(req);
+  if (!SAFE_METHODS.has(req.method)) {
+    const csrfToken = readCookie('csrf_token');
+    if (csrfToken) {
+      authReq = authReq.clone({ setHeaders: { 'X-CSRF-Token': csrfToken } });
+    }
   }
-
-  const authReq = req.clone({
-    setHeaders: { Authorization: `Bearer ${token}` },
-  });
 
   return next(authReq);
 };

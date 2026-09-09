@@ -14,12 +14,14 @@ public class AuthService : IAuthService
     private readonly IUserService _userService;
     private readonly IConfiguration _configuration;
     private readonly IJwtTokenGenerator _tokenGenerator;
+    private readonly ILogger<AuthService> _logger;
 
-    public AuthService(IUserService userService, IConfiguration configuration, IJwtTokenGenerator tokenGenerator)
+    public AuthService(IUserService userService, IConfiguration configuration, IJwtTokenGenerator tokenGenerator, ILogger<AuthService> logger)
     {
         _userService = userService;
         _configuration = configuration;
         _tokenGenerator = tokenGenerator;
+        _logger = logger;
     }
 
     public async Task<Result<AuthResult>> LoginWithGoogleAsync(string idToken)
@@ -27,13 +29,11 @@ public class AuthService : IAuthService
         GoogleJsonWebSignature.Payload payload;
         try
         {
-            var settings = new GoogleJsonWebSignature.ValidationSettings {
-                Audience = [_configuration["Google:ClientId"]]
-            };
-            payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
+            payload = await GoogleJsonWebSignature.ValidateAsync(idToken);
         }
-        catch (InvalidJwtException)
+        catch (Exception ex)
         {
+            _logger.LogWarning(ex, "Fail to validade Google ID token. Type: {ExType}", ex.GetType().Name);
             return Result<AuthResult>.Failure("Invalid Google token.");
         }
 

@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <h1>Teste isolado do Google Identity Services</h1>
+  <p>Origem desta página: <b id="origin"></b></p>
+
+  <div
+    id="g_id_onload"
+    data-client_id="827888631012-nvuuvds5fd2j2s20t8se1vo16rmqnp0n.apps.googleusercontent.com"
+    data-callback="handleCredentialResponse">
+  </div>
+
+  <div class="g_id_signin" data-type="standard" data-size="large"></div>
+
+  <script>
+    document.getElementById('origin').textContent = window.location.origin;
+    function handleCredentialResponse(response) {
+      console.log('Credential recebida:', response);
+      document.body.innerHTML += '<p style="color:green">Login funcionou!</p>';
+    }
+  </script>
+</body>
+</html>

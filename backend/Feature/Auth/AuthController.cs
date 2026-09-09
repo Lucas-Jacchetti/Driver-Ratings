@@ -1,6 +1,7 @@
 using backend.Domain.Interfaces;
 using backend.Feature.Auth.DataManipulation;
 using backend.Feature.Users.DataManipulation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -11,13 +12,14 @@ namespace backend.Feature.Auth;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _service;
+    private static readonly CookieOptions CookiePath = new() { Path = "/" };
 
     public AuthController(IAuthService service)
     {
         _service = service;
     }
 
-    [EnableRateLimiting("google-login")]
+    //[EnableRateLimiting("google-login")]
     [HttpPost("google")]
     public async Task<IActionResult> LoginWithGoogle(GoogleLoginRequest request)
     {
@@ -28,11 +30,42 @@ public class AuthController : ControllerBase
             return Unauthorized(new { error = result.Error });
         }
 
-        var response = new AuthResponseDTO(
-            result.Value!.Token,
-            UserMapper.ToResponse(result.Value.User)
-        );
+        SetAuthCookies(result.Value!.Token);
 
-        return Ok(response);
+        return Ok(UserMapper.ToResponse(result.Value.User));
+    }
+
+    [Authorize]
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        Response.Cookies.Delete("access_token", CookiePath);
+        Response.Cookies.Delete("csrf_token", CookiePath);
+        return NoContent();
+    }
+
+    
+
+    private void SetAuthCookies(string token)
+    {
+        var expires = DateTimeOffset.UtcNow.AddDays(7);
+
+        Response.Cookies.Append("access_token", token, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = expires,
+            Path = "/"
+        });
+
+        Response.Cookies.Append("csrf_token", Guid.NewGuid().ToString("N"), new CookieOptions
+        {
+            HttpOnly = false,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = expires,
+            Path = "/"
+        });
     }
 }

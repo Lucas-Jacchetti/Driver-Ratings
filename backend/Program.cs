@@ -18,14 +18,20 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text.Json.Serialization;
 using System.Security.Claims;
 using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.RateLimiting;
+using backend.Domain.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<CsrfValidationFilter>();
+}).AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 builder.Services.AddExceptionHandler<backend.Common.GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
@@ -67,6 +73,18 @@ builder.Services
             ValidateAudience = false,
             ValidateLifetime = true
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                if (context.Request.Cookies.TryGetValue("access_token", out var token))
+                {
+                    context.Token = token;
+                }
+                return Task.CompletedTask;
+            }
+        };
     });
 
 var allowedOrigins = builder.Configuration
@@ -77,21 +95,15 @@ builder.Services.AddCors(options =>
     options.AddPolicy("Frontend", policy =>
         policy.WithOrigins(allowedOrigins)
             .AllowAnyHeader()
-            .AllowAnyMethod());
+            .AllowAnyMethod()
+            .AllowCredentials());
 });
-
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    });
 
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-    // Login com Google: sem usuário autenticado ainda, então particiona por IP.
-    // 5 tentativas por minuto é suficiente para uso normal (login falha e tenta de novo raramente).
+   
     options.AddPolicy("google-login", httpContext =>
     {
         var ip = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
@@ -104,8 +116,6 @@ builder.Services.AddRateLimiter(options =>
         });
     });
 
-    // Entrar em comunidade por código: usuário já autenticado, particiona por UserId
-    // (evita que um usuário logado fique tentando força bruta o código de 6 caracteres).
     options.AddPolicy("community-join", httpContext =>
     {
         var key = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
