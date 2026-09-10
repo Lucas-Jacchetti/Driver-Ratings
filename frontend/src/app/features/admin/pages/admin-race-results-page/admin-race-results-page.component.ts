@@ -114,6 +114,42 @@ import { extractApiError } from '../../../../shared/utils/http-error';
                 />
               </div>
 
+              @if (isSprintRace()) {
+                <div class="w-28">
+                  <label
+                    class="mb-1 block text-xs uppercase tracking-wide text-gray-500"
+                  >
+                    Sprint Start
+                  </label>
+
+                  <input
+                    class="app-input"
+                    type="number"
+                    min="0"
+                    max="99"
+                    [(ngModel)]="result.startingPositionSprint"
+                    [name]="'starting-sprint-' + result.id"
+                  />
+                </div>
+
+                <div class="w-28">
+                  <label
+                    class="mb-1 block text-xs uppercase tracking-wide text-gray-500"
+                  >
+                    Sprint Finish
+                  </label>
+
+                  <input
+                    class="app-input"
+                    type="number"
+                    min="0"
+                    max="99"
+                    [(ngModel)]="result.finishingPositionSprint"
+                    [name]="'finishing-sprint-' + result.id"
+                  />
+                </div>
+              }
+
               <div class="min-w-[220px] flex-1">
                 <label
                   class="mb-1 block text-xs uppercase tracking-wide text-gray-500"
@@ -197,6 +233,10 @@ export class AdminRaceResultsPageComponent implements OnInit {
   onRaceChange(): void {
     this.saved.set(false);
     this.loadResults();
+  }
+
+  isSprintRace(): boolean {
+    return this.races().find(r => r.id === this.selectedRaceId)?.isSprint ?? false;
   }
 
   private loadRaces(): void {
