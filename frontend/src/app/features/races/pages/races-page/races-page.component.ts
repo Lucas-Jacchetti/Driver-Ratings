@@ -196,60 +196,63 @@ interface DisplayResult {
                   </div>
 
                   @if (item.startingPosition !== undefined) {
-                    <div
-                      class="flex flex-col justify-center"
-                      [class.gap-1]="isSprintRace()"
-                      [class.gap-4]="!isSprintRace()"
-                    >
+                    <div class="flex shrink-0 flex-col items-center gap-4 self-start">
                       @if (isSprintRace()) {
-                        <div class="flex shrink-0 items-center gap-2 sm:gap-3">
-                          <div class="text-center">
-                            <div class="mb-0.5 text-[9px] uppercase tracking-[0.15em] text-white/40">Sprint Start</div>
-                            <div
-                              class="font-bold text-gray-400"
-                              [class.text-xs]="true"
-                              [class.sm:text-sm]="true"
-                            >
-                              P{{ item.startingPositionSprint }}
+                        <div class="flex items-center gap-4">
+                          <div class="w-20 text-center">
+                            <div class="mb-1 whitespace-nowrap text-[9px] uppercase leading-none tracking-[0.1em] text-white/40">
+                              Sprint Start
                             </div>
+                            <div class="text-lg font-black leading-none text-gray-300">P{{ item.startingPositionSprint }}</div>
                           </div>
 
-                          <div class="text-center">
-                            <div class="mb-0.5 text-[9px] uppercase tracking-[0.15em] text-white/40">Sprint Fin.</div>
-                            <div
-                              class="font-bold text-gray-300"
-                              [class.text-xs]="true"
-                              [class.sm:text-sm]="true"
-                            >
+                          <div class="w-20 text-center">
+                            <div class="mb-1 whitespace-nowrap text-[9px] uppercase leading-none tracking-[0.1em] text-white/40">
+                              Sprint Finish
+                            </div>
+                            <div class="text-lg font-black leading-none text-white">
                               {{ finishLabel(item.finishingPositionSprint!) }}
                             </div>
                           </div>
                         </div>
-                      }
 
-                      <div class="flex shrink-0 items-center gap-3">
-                        <div class="text-center">
-                          <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">Started</div>
-                          <div
-                            class="font-black text-gray-300"
-                            [class.text-base]="isSprintRace()"
-                            [class.text-lg]="!isSprintRace()"
-                          >
-                            P{{ item.startingPosition }}
+                        <div class="flex items-center gap-4 ">
+                          <div class="w-20 text-center">
+                            <div class="mb-1 whitespace-nowrap text-[10px] uppercase leading-none tracking-[0.15em] text-white/40">
+                              Started
+                            </div>
+                            <div class="text-lg font-black leading-none text-gray-300">P{{ item.startingPosition }}</div>
+                          </div>
+
+                          <div class="w-20 text-center">
+                            <div class="mb-1 whitespace-nowrap text-[10px] uppercase leading-none tracking-[0.15em] text-white/40">
+                              Finished
+                            </div>
+                            <div class="text-lg font-black leading-none text-white">
+                              {{ finishLabel(item.finishingPosition!) }}
+                            </div>
                           </div>
                         </div>
+                      }
+                      @if (!isSprintRace()) {
+                      <div class="flex items-center gap-4 ">
+                        <div class="w-20 text-center">
+                          <div class="mb-2 whitespace-nowrap text-[10px] uppercase leading-none tracking-[0.15em] text-white/40">
+                            Started
+                          </div>
+                          <div class="text-lg font-black leading-none text-gray-300">P{{ item.startingPosition }}</div>
+                        </div>
 
-                        <div class="text-center">
-                          <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">Finished</div>
-                          <div
-                            class="font-black text-white"
-                            [class.text-base]="isSprintRace()"
-                            [class.text-lg]="!isSprintRace()"
-                          >
+                        <div class="w-20 text-center">
+                          <div class="mb-2 whitespace-nowrap text-[10px] uppercase leading-none tracking-[0.15em] text-white/40">
+                            Finished
+                          </div>
+                          <div class="text-lg font-black leading-none text-white">
                             {{ finishLabel(item.finishingPosition!) }}
                           </div>
                         </div>
                       </div>
+                      }
                     </div>
                   }
 

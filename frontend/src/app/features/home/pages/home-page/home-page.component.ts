@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../../../shared/components/icon.component';
@@ -42,6 +42,8 @@ function teamOrderIndex(teamName: string): number {
   const index = TEAM_ORDER.indexOf(teamName);
   return index === -1 ? TEAM_ORDER.length : index;
 }
+
+
 
 @Component({
   selector: 'app-home-page',
@@ -119,8 +121,18 @@ function teamOrderIndex(teamName: string): number {
 
                   <div class="flex w-56 shrink-0 items-start gap-3">
                     <div>
-                      <div class="text-xl font-black leading-tight text-white">
-                        {{ result.driverSeason.driver.name }}
+                      <div class="flex flex-row items-center gap-2 text-xl font-black leading-tight text-white">
+                        <p>{{ result.driverSeason.driver.name }}</p>
+                        @if (result.driverSeason.driver.flag) {
+                          <div class="flex h-5 w-7 shrink-0 items-center justify-center sm:h-5 sm:w-8 md:h-6 md:w-9">
+                            <img
+                              [src]="flagUrl(result.driverSeason.driver.flag)"
+                              alt=""
+                              class="h-full w-full object-cover rounded-sm"
+                              onerror="this.style.display='none'"
+                            />
+                          </div>
+                        }
                       </div>
 
                       <div class="mt-0.5 flex items-center gap-1.5">
@@ -152,51 +164,67 @@ function teamOrderIndex(teamName: string): number {
                       }
                     </div>
                   </div>
-                  
-                  <div class="flex flex-col gap-4">
-                    <div class="flex shrink-0 items-center gap-3">
-                      <div class="text-center">
-                        <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">
-                          Started (Sprint)
+
+                  <div class="flex shrink-0 flex-col items-center gap-4 self-start">
+                    @if (isSprintRace()) {
+                      <div class="flex items-center gap-4">
+                        <div class="w-20 text-center">
+                          <div class="mb-1 whitespace-nowrap text-[9px] uppercase leading-none tracking-[0.1em] text-white/40">
+                            Sprint Start
+                          </div>
+                          <div class="text-lg font-black leading-none text-gray-300">P{{ result.startingPositionSprint }}</div>
                         </div>
 
-                        <div class="text-lg font-black text-gray-300">
-                          P{{ result.startingPositionSprint }}
+                        <div class="w-20 text-center">
+                          <div class="mb-1 whitespace-nowrap text-[9px] uppercase leading-none tracking-[0.1em] text-white/40">
+                            Sprint Fin.
+                          </div>
+                          <div class="text-lg font-black leading-none text-white">
+                            {{ finishLabel(result.finishingPositionSprint!) }}
+                          </div>
                         </div>
                       </div>
 
-                      <div class="text-center">
-                        <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">
-                          Finished (Sprint)
-                        </div>
-
-                        <div class="text-lg font-black text-white">
-                          {{ finishLabel(result.finishingPositionSprint) }}
-                        </div>
-                      </div>
-                    </div>
-                    <div class="flex shrink-0 items-center gap-3">
-                      <div class="text-center">
-                        <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">
+                    <div class="flex items-center gap-4">
+                      <div class="w-20 text-center">
+                        <div class="mb-1 whitespace-nowrap text-[10px] uppercase leading-none tracking-[0.15em] text-white/40">
                           Started
                         </div>
-
-                        <div class="text-lg font-black text-gray-300">
-                          P{{ result.startingPosition }}
-                        </div>
+                        <div class="text-lg font-black leading-none text-gray-300">P{{ result.startingPosition }}</div>
                       </div>
 
-                      <div class="text-center">
-                        <div class="mb-0.5 text-[10px] uppercase tracking-[0.2em] text-white/40">
+                      <div class="w-20 text-center">
+                        <div class="mb-1 whitespace-nowrap text-[10px] uppercase leading-none tracking-[0.15em] text-white/40">
                           Finished
                         </div>
-
-                        <div class="text-lg font-black text-white">
+                        <div class="text-lg font-black leading-none text-white">
                           {{ finishLabel(result.finishingPosition) }}
                         </div>
                       </div>
                     </div>
+
+                    }
+                    @if (!isSprintRace()) {
+                    <div class="flex items-center gap-4">
+                      <div class="w-20 text-center">
+                        <div class="mb-2 whitespace-nowrap text-[10px] uppercase leading-none tracking-[0.15em] text-white/40">
+                          Started
+                        </div>
+                        <div class="text-lg font-black leading-none text-gray-300">P{{ result.startingPosition }}</div>
+                      </div>
+
+                      <div class="w-20 text-center">
+                        <div class="mb-2 whitespace-nowrap text-[10px] uppercase leading-none tracking-[0.15em] text-white/40">
+                          Finished
+                        </div>
+                        <div class="text-lg font-black leading-none text-white">
+                          {{ finishLabel(result.finishingPosition) }}
+                        </div>
+                      </div>
+                    </div>
+                    }
                   </div>
+                  
                   <div class="flex min-w-[220px] flex-1 items-center gap-4">
                     <input
                       type="range"
@@ -296,13 +324,15 @@ export class HomePageComponent implements OnInit {
   feedback = signal<'success' | 'error' | null>(null);
   feedbackMessage = signal('');
 
+  isSprintRace = computed(() => this.race()?.isSprint ?? false);
+
   scores: Record<string, number | undefined> = {};
   contextOpen: Record<string, boolean> = {};
 
   private originalScores: Record<string, number | undefined> = {};
 
   ngOnInit(): void {
-    this.racesService.getCurrent().subscribe({
+    this.racesService.getById("019fdf32-cdf4-7d82-af06-d655097e6aea").subscribe({
       next: (race) => {
         race.driverRaceResults = [...race.driverRaceResults].sort(
           (a, b) =>
