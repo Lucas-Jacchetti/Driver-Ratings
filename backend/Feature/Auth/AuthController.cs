@@ -19,7 +19,7 @@ public class AuthController : ControllerBase
         _service = service;
     }
 
-    [EnableRateLimiting("google-login")]
+    //[EnableRateLimiting("google-login")]
     [HttpPost("google")]
     public async Task<IActionResult> LoginWithGoogle(GoogleLoginRequest request)
     {
@@ -49,12 +49,14 @@ public class AuthController : ControllerBase
     private void SetAuthCookies(string token)
     {
         var expires = DateTimeOffset.UtcNow.AddDays(7);
+        var isSecure = Request.IsHttps;
+        var sameSite = isSecure ? SameSiteMode.None : SameSiteMode.Lax;
 
         Response.Cookies.Append("access_token", token, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.None,
+            Secure = isSecure,
+            SameSite = sameSite,
             Expires = expires,
             Path = "/"
         });
@@ -62,8 +64,8 @@ public class AuthController : ControllerBase
         Response.Cookies.Append("csrf_token", Guid.NewGuid().ToString("N"), new CookieOptions
         {
             HttpOnly = false,
-            Secure = true,
-            SameSite = SameSiteMode.None,
+            Secure = isSecure,
+            SameSite = sameSite,
             Expires = expires,
             Path = "/"
         });

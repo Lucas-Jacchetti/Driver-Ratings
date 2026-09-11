@@ -18,6 +18,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text.Json.Serialization;
 using System.Security.Claims;
 using System.Threading.RateLimiting;
+using System.Net;
+using System.Net.Sockets;
 using backend.Domain.Common;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,6 +43,22 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+builder.Services.AddHttpClient("google-certificates", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(10);
+}).ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+{
+    ConnectCallback = async (context, cancellationToken) =>
+    {
+        var addresses = await Dns.GetHostAddressesAsync(context.DnsEndPoint.Host, cancellationToken);
+        var address = addresses.FirstOrDefault(candidate => candidate.AddressFamily == AddressFamily.InterNetwork)
+            ?? throw new HttpRequestException("Nenhum endereço IPv4 encontrado para o Google.");
+        var socket = new Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+        await socket.ConnectAsync(new IPEndPoint(address, context.DnsEndPoint.Port), cancellationToken);
+        return new NetworkStream(socket, ownsSocket: true);
+    }
+});
 
 builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IRaceService, RaceService>();
