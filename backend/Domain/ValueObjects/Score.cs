@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace backend.Domain.ValueObjects;
 
 public class Score
@@ -39,8 +41,7 @@ public class Score
         return true;
     }
 
-    public override string ToString() => Value.ToString("0.0");
-
+    public override string ToString() => Value.ToString("0.00", CultureInfo.InvariantCulture);
     public override bool Equals(object? obj) => obj is Score other && Value == other.Value;
 
     public override int GetHashCode() => Value.GetHashCode();

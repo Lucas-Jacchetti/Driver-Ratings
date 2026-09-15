@@ -40,9 +40,9 @@ public class ScoreTests
     }
 
     [Theory]
-    [InlineData(0, "0.0")]
-    [InlineData(7, "7.0")]
-    [InlineData(9.75, "9.8")]
+    [InlineData(0, "0.00")]
+    [InlineData(7, "7.00")]
+    [InlineData(9.75, "9.75")]
     public void ToString_FormatsToOneDecimalPlace(decimal value, string expected)
     {
         Assert.Equal(expected, Score.Create(value).ToString());

@@ -14,7 +14,7 @@ public class RatingConfiguration : IEntityTypeConfiguration<Rating>
         {
             score.Property(s => s.Value)
                 .HasColumnName("Score")
-                .HasPrecision(3, 1)
+                .HasPrecision(4, 2)
                 .IsRequired();
         });
 

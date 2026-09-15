@@ -26,7 +26,7 @@ public class CommunityService : ICommunityService
         _dbContext.Communities.Add(community);
         await _dbContext.SaveChangesAsync();
 
-        var created = await GetByIdAsync(community.Id);
+        var created = await GetByIdInternalAsync(community.Id);
         return Result<Community>.Success(created!);
     }
 
@@ -142,5 +142,12 @@ public class CommunityService : ICommunityService
 
         await _dbContext.SaveChangesAsync();
         return Result<Community?>.Success(community!);
+    }
+
+    private async Task<Community?> GetByIdInternalAsync(Guid id)
+    {
+        return await _dbContext.Communities
+            .IncludeForMapping()
+            .FirstOrDefaultAsync(c => c.Id == id);
     }
 }
