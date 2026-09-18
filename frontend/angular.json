@@ -43,6 +43,12 @@
             "development": { "buildTarget": "f1ratings-frontend:build:development" }
           },
           "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular-builders/jest:run",
+          "options": {
+            "tsConfig": "tsconfig.spec.json"
+          }
         }
       }
     }
