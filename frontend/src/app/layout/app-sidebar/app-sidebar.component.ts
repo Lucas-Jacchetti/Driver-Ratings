@@ -89,7 +89,6 @@ export class AppSidebarComponent {
     { label: 'Rate Drivers', path: '/', icon: 'star', exact: true },
     { label: 'Rankings', path: '/races', icon: 'trophy' },
     { label: 'Communities', path: '/communities', icon: 'users' },
-    { label: 'Profile', path: '/profile', icon: 'user' },
   ];
 
   close(): void {
