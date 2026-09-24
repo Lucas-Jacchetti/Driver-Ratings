@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, Output, computed, inject } from '@angular/core';
 import { IconComponent } from '../../shared/components/icon.component';
 import { AuthService } from '../../features/auth/services/auth.service';
 import { Router } from '@angular/router';
@@ -19,7 +19,7 @@ import { Router } from '@angular/router';
         </button>
         <div>
           @if (authService.isAuthenticated()) {
-            <p class="text-sm font-semibold text-white sm:text-base">Hello, {{ firstName }}!</p>
+            <p class="text-sm font-semibold text-white sm:text-base">Hello, {{ firstName() }}!</p>
             <p class="text-xs text-gray-500 sm:text-sm">Keep up and rate the drivers for the current race.</p>
           }
           @else {
@@ -47,11 +47,9 @@ export class AppTopbarComponent {
   authService = inject(AuthService);
   private router = inject(Router);
 
-  userName = this.authService.currentUser()?.name;
+  userName = computed(() => this.authService.currentUser()?.name);
 
-  get firstName(): string | undefined {
-    return this.userName?.split(' ')[0];
-  }
+  firstName = computed(() => this.userName()?.split(' ')[0]);
 
   logout(): void {
     this.authService.logout();
