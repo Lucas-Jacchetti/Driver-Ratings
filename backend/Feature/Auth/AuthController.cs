@@ -13,13 +13,15 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _service;
     private static readonly CookieOptions CookiePath = new() { Path = "/" };
+    private readonly IWebHostEnvironment _environment;
 
-    public AuthController(IAuthService service)
+    public AuthController(IAuthService service, IWebHostEnvironment environment)
     {
         _service = service;
+        _environment = environment;
     }
 
-    //[EnableRateLimiting("google-login")]
+    [EnableRateLimiting("google-login")]
     [HttpPost("google")]
     public async Task<IActionResult> LoginWithGoogle(GoogleLoginRequest request)
     {
@@ -49,7 +51,7 @@ public class AuthController : ControllerBase
     private void SetAuthCookies(string token)
     {
         var expires = DateTimeOffset.UtcNow.AddDays(7);
-        var isSecure = Request.IsHttps;
+        var isSecure = !_environment.IsDevelopment();
         var sameSite = isSecure ? SameSiteMode.None : SameSiteMode.Lax;
 
         Response.Cookies.Append("access_token", token, new CookieOptions

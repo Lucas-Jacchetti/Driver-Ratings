@@ -4,6 +4,14 @@ import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   {
+    path: 'privacy',
+    loadComponent: () => import('./features/legal/pages/privacy-policy-page.component').then(m => m.PrivacyPolicyPageComponent),
+  },
+  {
+    path: 'terms',
+    loadComponent: () => import('./features/legal/pages/terms-of-service-page.component').then(m => m.TermsOfServicePageComponent),
+  },
+  {
     path: '',
     pathMatch: 'full',
     loadComponent: () =>
@@ -23,13 +31,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/communities/pages/communities-page/communities-page.component').then(
         (m) => m.CommunitiesPageComponent
-      ),
-  },
-  {
-    path: 'profile',
-    loadComponent: () =>
-      import('./features/users/pages/profile-page/profile-page.component').then(
-        (m) => m.ProfilePageComponent
       ),
   },
   {
