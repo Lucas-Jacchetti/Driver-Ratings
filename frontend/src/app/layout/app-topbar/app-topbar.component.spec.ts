@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { AppTopbarComponent } from './app-topbar.component';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('AppTopbarComponent', () => {
   let fixture: ComponentFixture<AppTopbarComponent>;
@@ -9,6 +11,7 @@ describe('AppTopbarComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppTopbarComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AppTopbarComponent);
